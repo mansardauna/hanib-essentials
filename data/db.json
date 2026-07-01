@@ -1,0 +1,100 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "owner",
+      "password": "password",
+      "role": "owner",
+      "address": "",
+      "phone": ""
+    },
+    {
+      "id": "2",
+      "username": "customer1",
+      "password": "password",
+      "role": "customer",
+      "address": "123 Main St, Kaduna",
+      "phone": "08012345678"
+    },
+    {
+      "id": "u1782832913093",
+      "username": "Mansur",
+      "password": "mansur",
+      "role": "customer",
+      "address": "ilorin",
+      "phone": "098240895763728"
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Back-to-School Backpack",
+      "category": "School Items",
+      "price": 12000,
+      "stock": 50,
+      "deliveryFee": 1000,
+      "specialOffer": true,
+      "image": "/images/backpack.png",
+      "description": "A durable, multi-compartment backpack designed for everyday school use. Features padded shoulder straps and water-resistant material."
+    },
+    {
+      "id": "p2",
+      "name": "Math Set & Stationery",
+      "category": "School Items",
+      "price": 2500,
+      "stock": 97,
+      "deliveryFee": 500,
+      "specialOffer": false,
+      "image": "/images/backpack.png",
+      "description": "Complete mathematics geometry set including compass, protractor, rulers, and pencils packed in a sturdy metal case."
+    },
+    {
+      "id": "p3",
+      "name": "RC Toy Car",
+      "category": "Toys",
+      "price": 15000,
+      "stock": 3,
+      "deliveryFee": 1500,
+      "specialOffer": true,
+      "image": "/images/toycar.png",
+      "description": "High-speed remote control car with off-road capabilities. Perfect for outdoor fun. Batteries included."
+    },
+    {
+      "id": "p4",
+      "name": "Educational Building Blocks",
+      "category": "Toys",
+      "price": 8000,
+      "stock": 5,
+      "deliveryFee": 1000,
+      "specialOffer": false,
+      "image": "/images/toycar.png",
+      "description": "100-piece set of colorful, interlocking building blocks. Helps develop spatial awareness and creativity in children."
+    }
+  ],
+  "orders": [
+    {
+      "id": "o1782832933316",
+      "userId": "u1782832913093",
+      "items": [
+        {
+          "productId": "p2",
+          "quantity": 3,
+          "name": "Math Set & Stationery",
+          "price": 2500
+        },
+        {
+          "productId": "p3",
+          "quantity": 2,
+          "name": "RC Toy Car",
+          "price": 15000
+        }
+      ],
+      "subtotal": 37500,
+      "deliveryFee": 4500,
+      "total": 42000,
+      "status": "Received",
+      "date": "2026-06-30T15:22:13.316Z"
+    }
+  ],
+  "expenses": []
+}
