@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { X, Home, ShoppingBag, LayoutDashboard, User as UserIcon } from 'lucide-react';
+import { X, Home, ShoppingBag, LayoutDashboard, User as UserIcon, Heart, HelpCircle, Settings } from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user } = useAuth();
@@ -20,12 +20,18 @@ export default function Sidebar({ isOpen, onClose }) {
           <Link href="/" onClick={onClose}><Home size={20}/> Home</Link>
           
           {user?.role === 'customer' && (
-            <Link href="/track-order" onClick={onClose}><ShoppingBag size={20}/> My Orders</Link>
+            <>
+              <Link href="/track-order" onClick={onClose}><ShoppingBag size={20}/> My Orders</Link>
+              <Link href="/wishlist" onClick={onClose}><Heart size={20}/> Wishlist</Link>
+            </>
           )}
           
           {user?.role === 'owner' && (
             <Link href="/dashboard" onClick={onClose}><LayoutDashboard size={20}/> Dashboard</Link>
           )}
+          
+          <Link href="/help" onClick={onClose}><HelpCircle size={20}/> Help Center</Link>
+          <Link href="/settings" onClick={onClose}><Settings size={20}/> Settings</Link>
           
           <div style={{marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1rem'}}>
             {user ? (
@@ -89,11 +95,14 @@ export default function Sidebar({ isOpen, onClose }) {
           gap: 1rem;
           font-weight: 600;
           text-transform: uppercase;
-          padding: 0.5rem 0;
-          transition: color 0.2s;
+          padding: 0.75rem 1rem;
+          border-radius: var(--radius-md);
+          transition: all 0.2s;
+          color: var(--foreground);
         }
         .sidebar-nav a:hover {
-          color: var(--muted-foreground);
+          color: var(--primary);
+          background: var(--muted);
         }
         .user-info {
           font-size: 0.875rem;

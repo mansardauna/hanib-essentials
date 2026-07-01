@@ -31,7 +31,7 @@
       "name": "Back-to-School Backpack",
       "category": "School Items",
       "price": 12000,
-      "stock": 50,
+      "stock": 49,
       "deliveryFee": 1000,
       "specialOffer": true,
       "image": "/images/backpack.png",
@@ -53,7 +53,7 @@
       "name": "RC Toy Car",
       "category": "Toys",
       "price": 15000,
-      "stock": 3,
+      "stock": 1,
       "deliveryFee": 1500,
       "specialOffer": true,
       "image": "/images/toycar.png",
@@ -69,6 +69,50 @@
       "specialOffer": false,
       "image": "/images/toycar.png",
       "description": "100-piece set of colorful, interlocking building blocks. Helps develop spatial awareness and creativity in children."
+    },
+    {
+      "id": "p5",
+      "name": "Premium Notebook Set",
+      "category": "School Items",
+      "price": 4500,
+      "stock": 120,
+      "deliveryFee": 800,
+      "specialOffer": true,
+      "image": "/images/backpack.png",
+      "description": "A pack of 5 premium hardcover notebooks with thick, bleed-resistant pages. Essential for every student."
+    },
+    {
+      "id": "p6",
+      "name": "Soft Plush Teddy Bear",
+      "category": "Toys",
+      "price": 6000,
+      "stock": 35,
+      "deliveryFee": 1200,
+      "specialOffer": false,
+      "image": "/images/toycar.png",
+      "description": "Ultra-soft and huggable plush teddy bear. Made from child-safe, hypoallergenic materials."
+    },
+    {
+      "id": "p7",
+      "name": "Scientific Calculator",
+      "category": "School Items",
+      "price": 9500,
+      "stock": 25,
+      "deliveryFee": 500,
+      "specialOffer": false,
+      "image": "/images/backpack.png",
+      "description": "Advanced scientific calculator with high-resolution display and 400+ built-in functions. Approved for major exams."
+    },
+    {
+      "id": "p8",
+      "name": "Action Figure Robot",
+      "category": "Toys",
+      "price": 12000,
+      "stock": 10,
+      "deliveryFee": 1500,
+      "specialOffer": true,
+      "image": "/images/toycar.png",
+      "description": "Interactive action figure robot with glowing LED eyes and movable joints. A perfect gift for sci-fi fans."
     }
   ],
   "orders": [
@@ -94,6 +138,29 @@
       "total": 42000,
       "status": "Received",
       "date": "2026-06-30T15:22:13.316Z"
+    },
+    {
+      "id": "o1782900934945",
+      "userId": "u1782832913093",
+      "items": [
+        {
+          "productId": "p3",
+          "quantity": 2,
+          "name": "RC Toy Car",
+          "price": 15000
+        },
+        {
+          "productId": "p1",
+          "quantity": 1,
+          "name": "Back-to-School Backpack",
+          "price": 12000
+        }
+      ],
+      "subtotal": 42000,
+      "deliveryFee": 4000,
+      "total": 46000,
+      "status": "Processing",
+      "date": "2026-07-01T10:15:34.945Z"
     }
   ],
   "expenses": []

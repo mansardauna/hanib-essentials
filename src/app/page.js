@@ -62,8 +62,8 @@ function ShopContent() {
       {/* Banner Section */}
       <section className="banner">
         <div className="banner-content">
-          <h1>HANIB ESSENTIALS</h1>
-          <p>Quality School Supplies & Toys at Unbeatable Prices.</p>
+          <h1>Hanibessentials</h1>
+          <p>We sell Stationery, back-to-school items, and Household essentials.</p>
         </div>
       </section>
 
@@ -89,53 +89,156 @@ function ShopContent() {
         </select>
       </div>
 
-      <div className="category-section">
-        <h2 className="section-title">{filter === 'All' ? 'Discover Items' : filter}</h2>
-        <div className="products-grid">
-          {displayedProducts.length === 0 ? (
-            <p>No products found.</p>
-          ) : (
-            displayedProducts.map(product => (
-              <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
-                <div className="product-img">
-                  {product.image ? (
-                    <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
-                  ) : (
-                    <span>{product.name.charAt(0)}</span>
-                  )}
-                  {product.specialOffer && <div className="badge">OFFER</div>}
-                </div>
-                <div className="product-info">
-                  <p className="category-tag">{product.category}</p>
-                  <h3 className="title" title={product.name}>{product.name}</h3>
-                  <div className="price-row">
-                    <span className="price">₦{product.price.toLocaleString()}</span>
-                    <span className="delivery">
-                      {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
-                    </span>
-                  </div>
-                  <div className="stock-info">
-                    {product.stock > 0 ? (
-                      <span className="in-stock">{product.stock} available</span>
+      {filter === 'All' && !search ? (
+        <>
+          <div className="category-section">
+            <h2 className="section-title">Trending Now</h2>
+            <div className="products-grid">
+              {displayedProducts.slice(0, 4).map(product => (
+                <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
+                  <div className="product-img">
+                    {product.image ? (
+                      <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
                     ) : (
-                      <span className="out-of-stock">Out of stock</span>
+                      <span>{product.name.charAt(0)}</span>
+                    )}
+                    {product.specialOffer && <div className="badge">OFFER</div>}
+                  </div>
+                  <div className="product-info">
+                    <p className="category-tag">{product.category}</p>
+                    <h3 className="title" title={product.name}>{product.name}</h3>
+                    {product.description && (
+                      <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
+                    )}
+                    <div className="price-row">
+                      <span className="price">₦{product.price.toLocaleString()}</span>
+                      <span className="delivery">
+                        {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
+                      </span>
+                    </div>
+                    <div className="stock-info">
+                      {product.stock > 0 ? (
+                        <span className="in-stock">{product.stock} available</span>
+                      ) : (
+                        <span className="out-of-stock">Out of stock</span>
+                      )}
+                    </div>
+                    {user?.role !== 'owner' && (
+                      <button 
+                        onClick={(e) => addToCart(product, e)} 
+                        className="btn btn-primary add-btn"
+                        disabled={product.stock <= 0}
+                      >
+                        {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
+                      </button>
                     )}
                   </div>
-                  {user?.role !== 'owner' && (
-                    <button 
-                      onClick={(e) => addToCart(product, e)} 
-                      className="btn btn-primary add-btn"
-                      disabled={product.stock <= 0}
-                    >
-                      {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
-                    </button>
-                  )}
-                </div>
-              </Link>
-            ))
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {displayedProducts.length > 4 && (
+            <div className="category-section" style={{marginTop: '4rem'}}>
+              <h2 className="section-title">Discover More Items</h2>
+              <div className="products-grid">
+                {displayedProducts.slice(4).map(product => (
+                  <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
+                    <div className="product-img">
+                      {product.image ? (
+                        <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
+                      ) : (
+                        <span>{product.name.charAt(0)}</span>
+                      )}
+                      {product.specialOffer && <div className="badge">OFFER</div>}
+                    </div>
+                    <div className="product-info">
+                      <p className="category-tag">{product.category}</p>
+                      <h3 className="title" title={product.name}>{product.name}</h3>
+                      {product.description && (
+                        <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
+                      )}
+                      <div className="price-row">
+                        <span className="price">₦{product.price.toLocaleString()}</span>
+                        <span className="delivery">
+                          {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
+                        </span>
+                      </div>
+                      <div className="stock-info">
+                        {product.stock > 0 ? (
+                          <span className="in-stock">{product.stock} available</span>
+                        ) : (
+                          <span className="out-of-stock">Out of stock</span>
+                        )}
+                      </div>
+                      {user?.role !== 'owner' && (
+                        <button 
+                          onClick={(e) => addToCart(product, e)} 
+                          className="btn btn-primary add-btn"
+                          disabled={product.stock <= 0}
+                        >
+                          {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
+                        </button>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
+        </>
+      ) : (
+        <div className="category-section">
+          <h2 className="section-title">{search ? `Search Results for "${search}"` : filter}</h2>
+          <div className="products-grid">
+            {displayedProducts.length === 0 ? (
+              <p>No products found.</p>
+            ) : (
+              displayedProducts.map(product => (
+                <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
+                  <div className="product-img">
+                    {product.image ? (
+                      <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
+                    ) : (
+                      <span>{product.name.charAt(0)}</span>
+                    )}
+                    {product.specialOffer && <div className="badge">OFFER</div>}
+                  </div>
+                  <div className="product-info">
+                    <p className="category-tag">{product.category}</p>
+                    <h3 className="title" title={product.name}>{product.name}</h3>
+                    {product.description && (
+                      <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
+                    )}
+                    <div className="price-row">
+                      <span className="price">₦{product.price.toLocaleString()}</span>
+                      <span className="delivery">
+                        {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
+                      </span>
+                    </div>
+                    <div className="stock-info">
+                      {product.stock > 0 ? (
+                        <span className="in-stock">{product.stock} available</span>
+                      ) : (
+                        <span className="out-of-stock">Out of stock</span>
+                      )}
+                    </div>
+                    {user?.role !== 'owner' && (
+                      <button 
+                        onClick={(e) => addToCart(product, e)} 
+                        className="btn btn-primary add-btn"
+                        disabled={product.stock <= 0}
+                      >
+                        {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
+                      </button>
+                    )}
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <style jsx>{`
         .shop-container {
@@ -164,12 +267,23 @@ function ShopContent() {
           font-size: 1.25rem;
           color: #a0a0a0;
         }
+        @media (max-width: 768px) {
+          .banner {
+            padding: 3rem 1rem;
+          }
+          .banner-content h1 {
+            font-size: 2rem;
+          }
+          .banner-content p {
+            font-size: 1rem;
+          }
+        }
         .filter-sort-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 2rem;
-          flex-wrap: nowrap;
+          flex-wrap: wrap;
           gap: 1rem;
         }
         .sort-select {
@@ -183,6 +297,11 @@ function ShopContent() {
           outline: none;
           min-width: 200px;
           box-shadow: var(--shadow-sm);
+        }
+        @media (max-width: 768px) {
+          .sort-select {
+            width: 100%;
+          }
         }
         .filter-bar {
           display: flex;
@@ -217,8 +336,18 @@ function ShopContent() {
         }
         .products-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          grid-template-columns: repeat(4, 1fr);
           gap: 1.5rem;
+        }
+        @media (max-width: 1024px) {
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 600px) {
+          .products-grid {
+            grid-template-columns: 1fr;
+          }
         }
         .product-card {
           display: flex;

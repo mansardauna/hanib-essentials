@@ -17,6 +17,12 @@ export default function Navbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/products').then(res => res.json()).then(setAllProducts).catch(console.error);
+  }, []);
 
   useEffect(() => {
     setSearchTerm(searchParams.get('search') || '');
@@ -53,23 +59,47 @@ export default function Navbar() {
           </div>
           
           <form className="nav-center" onSubmit={handleSearch}>
-            <div className="search-box">
-              <Search size={18} className="search-icon" />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
-                value={searchTerm}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSearchTerm(val);
-                  if (val) {
-                    router.push(`/?search=${encodeURIComponent(val)}`);
-                  } else {
-                    router.push(`/`);
-                  }
-                }}
-                className="search-input"
-              />
+            <div className="search-wrapper">
+              <div className="search-box">
+                <Search size={18} className="search-icon" />
+                <input 
+                  type="text" 
+                  placeholder="Search products..." 
+                  value={searchTerm}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearchTerm(val);
+                    setShowDropdown(val.length > 0);
+                    if (val) {
+                      router.push(`/?search=${encodeURIComponent(val)}`);
+                    } else {
+                      router.push(`/`);
+                    }
+                  }}
+                  onFocus={() => { if (searchTerm) setShowDropdown(true); }}
+                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                  className="search-input"
+                />
+              </div>
+              
+              {showDropdown && (
+                <div className="search-dropdown">
+                  {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(prod => (
+                    <Link key={prod.id} href={`/product/${prod.id}`} className="dropdown-item">
+                      <div className="dropdown-img">
+                        {prod.image ? <Image src={prod.image} alt={prod.name} width={40} height={40} style={{objectFit: 'cover'}}/> : <span className="placeholder">{prod.name.charAt(0)}</span>}
+                      </div>
+                      <div className="dropdown-info">
+                        <span className="dropdown-name">{prod.name}</span>
+                        <span className="dropdown-price">₦{prod.price.toLocaleString()}</span>
+                      </div>
+                    </Link>
+                  ))}
+                  {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                    <div className="dropdown-empty">No results found.</div>
+                  )}
+                </div>
+              )}
             </div>
           </form>
           
@@ -120,6 +150,11 @@ export default function Navbar() {
           padding: 0 1rem;
           flex: 0 1 500px;
         }
+        .search-wrapper {
+          position: relative;
+          width: 100%;
+          max-width: 500px;
+        }
         .search-box {
           display: flex;
           align-items: center;
@@ -128,7 +163,6 @@ export default function Navbar() {
           border-radius: var(--radius-full);
           padding: 0.5rem 1rem;
           width: 100%;
-          max-width: 500px;
           box-shadow: var(--shadow-sm);
           transition: all 0.3s ease;
         }
@@ -148,6 +182,67 @@ export default function Navbar() {
           font-family: var(--font-poppins);
           font-size: 0.875rem;
           color: var(--foreground);
+        }
+        .search-dropdown {
+          position: absolute;
+          top: calc(100% + 0.5rem);
+          left: 0;
+          width: 100%;
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-md);
+          max-height: 400px;
+          overflow-y: auto;
+          z-index: 100;
+        }
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          padding: 1rem 1.5rem;
+          gap: 1.25rem;
+          border-bottom: 1px solid var(--border);
+          transition: background 0.2s;
+        }
+        .dropdown-item:hover {
+          background: var(--muted);
+        }
+        .dropdown-img {
+          width: 40px; height: 40px;
+          background: var(--muted);
+          border-radius: var(--radius-sm);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+        .placeholder {
+          font-weight: 700;
+          color: var(--muted-foreground);
+        }
+        .dropdown-info {
+          display: flex;
+          flex-direction: column;
+        }
+        .dropdown-name {
+          font-weight: 600;
+          font-size: 0.9rem;
+          margin-bottom: 0.2rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 300px;
+        }
+        .dropdown-price {
+          color: var(--primary);
+          font-size: 0.75rem;
+          font-weight: 700;
+        }
+        .dropdown-empty {
+          padding: 1rem;
+          text-align: center;
+          color: var(--muted-foreground);
+          font-size: 0.875rem;
         }
         .nav-actions {
           display: flex;

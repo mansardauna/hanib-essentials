@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import fs from 'fs';
 
 export async function POST(request) {
   try {
@@ -17,6 +18,11 @@ export async function POST(request) {
     // Create a unique filename
     const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const uploadDir = path.join(process.cwd(), 'public/uploads');
+    
+    if (!fs.existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true });
+    }
+    
     const filepath = path.join(uploadDir, filename);
 
     // Note: In production, you'd want to validate file type and size.
