@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { Package, Truck, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function TrackOrder() {
   const { user, loading } = useAuth();
   const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,23 +19,19 @@ export default function TrackOrder() {
     }
 
     if (user) {
-      fetch(`/api/orders?userId=${user.id}`)
-        .then(res => res.json())
-        .then(data => setOrders(data))
-        .catch(console.error);
+      supabase.from('orders').select('*').eq('userId', user.id).order('date', { ascending: false })
+        .then(({ data, error }) => {
+          if (!error && data) setOrders(data);
+          setLoadingOrders(false);
+        });
     }
   }, [user, loading, router]);
 
   const markReceived = async (orderId) => {
     try {
-      const res = await fetch('/api/orders', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: orderId, status: 'Received' })
-      });
-      if (res.ok) {
-        const updated = await res.json();
-        setOrders(prev => prev.map(o => o.id === orderId ? updated : o));
+      const { data, error } = await supabase.from('orders').update({ status: 'Received' }).eq('id', orderId).select();
+      if (!error && data) {
+        setOrders(prev => prev.map(o => o.id === orderId ? data[0] : o));
       }
     } catch (error) {
       console.error(error);

@@ -52,8 +52,15 @@ body {
   font-family: var(--font-poppins), sans-serif;
   background-color: var(--background);
   color: var(--foreground);
+  min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+@media(max-width: 768px) {
+  body {
+    padding-bottom: 70px;
+  }
 }
 
 a {

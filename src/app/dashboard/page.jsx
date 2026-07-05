@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, DollarSign, TrendingUp } from 'lucide-react';
+import { ShoppingBag, DollarSign, TrendingUp, Package, Users } from 'lucide-react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function DashboardOverview() {
   const [orders, setOrders] = useState([]);
@@ -10,9 +11,9 @@ export default function DashboardOverview() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('/api/orders').then(r => r.json()).then(setOrders).catch(console.error);
-    fetch('/api/expenses').then(r => r.json()).then(setExpenses).catch(console.error);
-    fetch('/api/products').then(r => r.json()).then(setProducts).catch(console.error);
+    supabase.from('orders').select('*').then(({ data }) => { if (data) setOrders(data); });
+    supabase.from('expenses').select('*').then(({ data }) => { if (data) setExpenses(data); });
+    supabase.from('products').select('*').then(({ data }) => { if (data) setProducts(data); });
   }, []);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);

@@ -1,25 +1,37 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Truck, CheckCircle, Clock } from 'lucide-react';
 
 export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetch('/api/orders').then(r => r.json()).then(setOrders).catch(console.error);
+    supabase.from('orders').select('*').order('date', { ascending: false }).then(({ data }) => { if (data) setOrders(data); });
   }, []);
 
   const updateStatus = async (id, status) => {
     try {
-      const res = await fetch('/api/orders', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, status })
-      });
-      if (res.ok) {
-        const updated = await res.json();
-        setOrders(prev => prev.map(o => o.id === id ? updated : o));
+      const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select();
+      if (!error && data) {
+        setOrders(prev => prev.map(o => o.id === id ? data[0] : o));
+        
+        // Send status update email
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: 'customer@hanib.demo', // Replace with dynamic customer email if available
+              subject: `Order Update - ${id}`,
+              html: `<h1>Order Status Update</h1>
+                     <p>Your order <strong>${id}</strong> has been updated to: <strong>${status}</strong></p>`
+            })
+          });
+        } catch (e) {
+          console.error('Email sending failed', e);
+        }
       }
     } catch (error) {
       console.error(error);

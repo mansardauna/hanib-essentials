@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 const AuthContext = createContext();
 
@@ -9,75 +10,81 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('hanib_user_v2');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setUser({ id: session.user.id, ...session.user.user_metadata });
+      }
+      setLoading(false);
+    });
+
+    // Listen for changes on auth state (logged in, signed out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setUser({ id: session.user.id, ...session.user.user_metadata });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (username, password) => {
     try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', username, password })
+      // In Supabase, login requires email. Since our app used 'username', 
+      // we'll append a dummy domain if they just enter a username, 
+      // OR expect them to enter an email. Let's assume username is formatted as email
+      // to keep it simple, or we format it.
+      const email = username.includes('@') ? username : `${username}@hanibessentials.com`;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-        localStorage.setItem('hanib_user_v2', JSON.stringify(data));
-        return { success: true };
-      }
-      const err = await res.json();
-      return { success: false, error: err.error };
+      if (error) throw error;
+      return { success: true };
     } catch (error) {
-      return { success: false, error: 'Login failed' };
+      return { success: false, error: error.message || 'Login failed' };
     }
   };
 
   const register = async (username, password, role) => {
     try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'register', username, password, role })
+      const email = username.includes('@') ? username : `${username}@hanibessentials.com`;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            role,
+            address: '',
+            phone: ''
+          }
+        }
       });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-        localStorage.setItem('hanib_user_v2', JSON.stringify(data));
-        return { success: true };
-      }
-      const err = await res.json();
-      return { success: false, error: err.error };
+      if (error) throw error;
+      return { success: true };
     } catch (error) {
-      return { success: false, error: 'Registration failed' };
+      return { success: false, error: error.message || 'Registration failed' };
     }
   };
 
   const updateProfile = async (address, phone) => {
     try {
-      const res = await fetch('/api/auth', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: user.id, address, phone })
+      const { data, error } = await supabase.auth.updateUser({
+        data: { address, phone }
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setUser(updated);
-        localStorage.setItem('hanib_user_v2', JSON.stringify(updated));
-        return { success: true };
-      }
-      return { success: false };
+      if (error) throw error;
+      setUser({ id: data.user.id, ...data.user.user_metadata });
+      return { success: true };
     } catch (error) {
       return { success: false };
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('hanib_user_v2');
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   return (

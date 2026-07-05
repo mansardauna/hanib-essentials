@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { ShoppingCart, LogOut, Menu, Search } from 'lucide-react';
+import { ShoppingCart, LogOut, Menu, Search, Home, Settings } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CartModal from './CartModal';
 import Sidebar from './Sidebar';
+import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -21,7 +22,11 @@ export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    fetch('/api/products').then(res => res.json()).then(setAllProducts).catch(console.error);
+    supabase.from('products').select('*')
+      .then(({ data, error }) => {
+        if (!error && data) setAllProducts(data);
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -121,6 +126,27 @@ export default function Navbar() {
       {user?.role !== 'owner' && (
         <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cart={cart} setCart={setCart} />
       )}
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="mobile-bottom-nav">
+        <Link href="/" className="bottom-nav-item">
+          <Home size={28} />
+        </Link>
+        <button className="bottom-nav-item" onClick={() => document.querySelector('.search-input')?.focus()}>
+          <Search size={28} />
+        </button>
+        {user?.role !== 'owner' && (
+          <button className="bottom-nav-item" onClick={() => setIsCartOpen(true)}>
+            <div className="cart-icon-wrapper">
+              <ShoppingCart size={28} />
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </div>
+          </button>
+        )}
+        <Link href={user ? "/dashboard" : "/auth"} className="bottom-nav-item">
+          <Settings size={28} />
+        </Link>
+      </nav>
 
       <style jsx>{`
         .navbar {
@@ -263,6 +289,73 @@ export default function Navbar() {
         .logout-btn:hover {
           background: transparent;
           color: red;
+        }
+
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 64px;
+          background: var(--card);
+          border-top: 1px solid var(--border);
+          z-index: 1000;
+          box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+          padding-bottom: env(safe-area-inset-bottom);
+          align-items: center;
+          justify-content: space-around;
+        }
+        .bottom-nav-item {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          flex: 1;
+          color: var(--muted-foreground);
+          text-decoration: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin: 0;
+          padding: 0;
+        }
+        .bottom-nav-item:hover, .bottom-nav-item:active {
+          color: var(--primary);
+        }
+        .cart-icon-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .cart-badge {
+          position: absolute;
+          top: -4px;
+          right: -8px;
+          background: red;
+          color: white;
+          border-radius: 50%;
+          padding: 0.15rem 0.35rem;
+          font-size: 0.65rem;
+          font-weight: bold;
+          line-height: 1;
+        }
+
+        @media(max-width: 768px) {
+          .mobile-bottom-nav {
+            display: flex;
+          }
+          .nav-actions .cart-btn {
+            display: none;
+          }
+          .nav-center {
+            padding: 0;
+          }
+          .search-input {
+            width: 120px;
+          }
         }
       `}</style>
     </>

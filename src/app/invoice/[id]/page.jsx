@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Printer, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
 
 export default function InvoicePage() {
   const { id } = useParams();
@@ -20,14 +21,12 @@ export default function InvoicePage() {
       return;
     }
 
-    fetch(`/api/orders`)
-      .then(r => r.json())
-      .then(data => {
-        const found = data.find(o => o.id === id);
-        if (!found) {
+    supabase.from('orders').select('*').eq('id', id).single()
+      .then(({ data, error }) => {
+        if (error || !data) {
           setError('Order not found');
         } else {
-          setOrder(found);
+          setOrder(data);
         }
       })
       .catch(err => {
@@ -68,9 +67,7 @@ export default function InvoicePage() {
         <div className="billing-info">
           <div className="bill-to">
             <h3>Bill To:</h3>
-            <p><strong>{order.user.username}</strong></p>
-            <p>{order.user.address}</p>
-            <p>{order.user.phone}</p>
+            <p><strong>Customer ID: {order.userId}</strong></p>
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { PlayCircle, Star, User } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -13,14 +14,18 @@ export default function ProductDetail() {
   
   const [reviewText, setReviewText] = useState('');
   const [rating, setRating] = useState(5);
+  const [reviews, setReviews] = useState([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(products => {
-        const found = products.find(p => p.id === id);
-        setProduct(found);
+    supabase.from('products').select('*').eq('id', id).single()
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setProduct(data);
+          if (data.reviews) {
+            setReviews(data.reviews);
+          }
+        }
       })
       .catch(console.error);
   }, [id]);
@@ -50,26 +55,21 @@ export default function ProductDetail() {
     if (!reviewText.trim()) return;
     setIsSubmittingReview(true);
     
-    const newReview = {
-      user: user.username,
-      rating,
-      text: reviewText,
-      date: new Date().toISOString()
-    };
-    
-    const updatedProduct = {
-      ...product,
-      reviews: [...(product.reviews || []), newReview]
-    };
+    const newReviews = [
+      ...(reviews || []),
+      {
+        user: user.username,
+        rating,
+        text: reviewText,
+        date: new Date().toISOString()
+      }
+    ];
     
     try {
-      const res = await fetch('/api/products', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProduct)
-      });
-      if (res.ok) {
-        setProduct(updatedProduct);
+      const { data, error } = await supabase.from('products').update({ reviews: newReviews }).eq('id', product.id).select();
+
+      if (!error && data) {
+        setReviews(newReviews);
         setReviewText('');
         setRating(5);
       }

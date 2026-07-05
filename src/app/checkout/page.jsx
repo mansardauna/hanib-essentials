@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function CheckoutPage() {
   const { user, updateProfile, loading } = useAuth();
@@ -52,24 +53,43 @@ export default function CheckoutPage() {
     const total = subtotal + totalDeliveryFee;
     
     try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          items: cart.map(item => ({ productId: item.id, quantity: item.quantity, name: item.name, price: item.price })),
-          subtotal,
-          deliveryFee: totalDeliveryFee,
-          total
-        })
-      });
-      if (res.ok) {
+      const newOrder = {
+        id: `o${Date.now()}`,
+        userId: user.id,
+        items: cart.map(item => ({ productId: item.id, quantity: item.quantity, name: item.name, price: item.price })),
+        subtotal,
+        deliveryFee: totalDeliveryFee,
+        total,
+        status: "Processing"
+      };
+
+      const { data, error } = await supabase.from('orders').insert([newOrder]).select();
+
+      if (!error && data) {
         localStorage.removeItem('hanib_cart_v2');
+        
+        // Send order confirmation email
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: user.email,
+              subject: `Order Confirmation - ${newOrder.id}`,
+              html: `<h1>Thank you for your order!</h1>
+                     <p>Your order <strong>${newOrder.id}</strong> has been received and is currently processing.</p>
+                     <p>Total: ₦${total.toLocaleString()}</p>
+                     <p><a href="http://localhost:3000/receipt/${newOrder.id}">View your receipt and QR Code</a></p>`
+            })
+          });
+        } catch (e) {
+          console.error('Email sending failed', e);
+        }
+
         setShowOPayModal(false);
         router.push('/track-order');
       } else {
-        const err = await res.json();
-        alert(err.error || 'Checkout failed');
+        alert(error?.message || 'Checkout failed');
         setShowOPayModal(false);
       }
     } catch (error) {

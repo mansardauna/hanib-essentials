@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, UploadCloud } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ProductsManagement() {
   const [products, setProducts] = useState([]);
@@ -25,7 +26,7 @@ export default function ProductsManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch('/api/products').then(r => r.json()).then(setProducts).catch(console.error);
+    supabase.from('products').select('*').then(({ data }) => { if (data) setProducts(data); });
   }, []);
 
   const handleEditClick = (product) => {
@@ -35,14 +36,9 @@ export default function ProductsManagement() {
 
   const handleSaveEdit = async (id) => {
     try {
-      const res = await fetch('/api/products', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm)
-      });
-      if (res.ok) {
-        const updated = await res.json();
-        setProducts(prev => prev.map(p => p.id === id ? updated : p));
+      const { data, error } = await supabase.from('products').update(editForm).eq('id', id).select();
+      if (!error && data) {
+        setProducts(prev => prev.map(p => p.id === id ? data[0] : p));
         setEditingId(null);
       }
     } catch (error) {
@@ -81,21 +77,17 @@ export default function ProductsManagement() {
       if (videoFile) videoUrl = await uploadFile(videoFile);
 
       const newProduct = {
+        id: `p${Date.now()}`,
         ...addForm,
         image: imageUrl,
         video: videoUrl,
         specialOffer: false
       };
 
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProduct)
-      });
+      const { data, error } = await supabase.from('products').insert([newProduct]).select();
 
-      if (res.ok) {
-        const created = await res.json();
-        setProducts([...products, created]);
+      if (!error && data) {
+        setProducts([...products, data[0]]);
         setIsAddModalOpen(false);
         // Reset form
         setAddForm({ name: '', category: 'School Items', description: '', price: 0, stock: 0, deliveryFee: 0 });

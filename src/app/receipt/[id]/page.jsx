@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Printer, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
+import { supabase } from '@/lib/supabase';
+import { QRCodeCanvas } from 'qrcode.react';
 
 export default function ReceiptPage() {
   const { id } = useParams();
@@ -20,16 +22,14 @@ export default function ReceiptPage() {
       return;
     }
 
-    fetch(`/api/orders`)
-      .then(r => r.json())
-      .then(data => {
-        const found = data.find(o => o.id === id);
-        if (!found) {
+    supabase.from('orders').select('*').eq('id', id).single()
+      .then(({ data, error }) => {
+        if (error || !data) {
           setError('Order not found');
-        } else if (found.userId !== user.id) {
+        } else if (data.userId !== user.id && user.role !== 'owner') {
           setError('Unauthorized');
         } else {
-          setOrder(found);
+          setOrder(data);
         }
       })
       .catch(err => {
@@ -57,6 +57,9 @@ export default function ReceiptPage() {
           <Image src="/images/logo.png" alt="Hanib Logo" width={150} height={60} style={{objectFit: 'contain'}} />
           <h2>Customer Receipt</h2>
           <p className="order-date">{new Date(order.date).toLocaleDateString()} {new Date(order.date).toLocaleTimeString()}</p>
+          <div style={{marginTop: '1.5rem', display: 'flex', justifyContent: 'center'}}>
+            <QRCodeCanvas value={`Order ID: ${order.id}\nCustomer ID: ${order.userId}\nTotal: ₦${order.total}`} size={100} />
+          </div>
         </div>
 
         <div className="receipt-details">
@@ -64,13 +67,7 @@ export default function ReceiptPage() {
             <strong>Order ID:</strong> {order.id}
           </div>
           <div className="detail-group">
-            <strong>Customer:</strong> {order.user.username}
-          </div>
-          <div className="detail-group">
-            <strong>Delivery Address:</strong> {order.user.address}
-          </div>
-          <div className="detail-group">
-            <strong>Phone:</strong> {order.user.phone}
+            <strong>Status:</strong> {order.status}
           </div>
         </div>
 

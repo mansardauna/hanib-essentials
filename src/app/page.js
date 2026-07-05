@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { supabase } from '@/lib/supabase';
 
 function ShopContent() {
   const [products, setProducts] = useState([]);
@@ -16,9 +17,10 @@ function ShopContent() {
   const search = searchParams.get('search') || '';
 
   useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(setProducts)
+    supabase.from('products').select('*')
+      .then(({ data, error }) => {
+        if (!error && data) setProducts(data);
+      })
       .catch(console.error);
   }, []);
 
