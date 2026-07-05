@@ -6,7 +6,7 @@ const supabase = createClient(url, key);
 
 async function createAdmin() {
   const { data, error } = await supabase.auth.signUp({
-    email: 'admin@hanibessentials.com',
+    email: 'hanibadmin@gmail.com',
     password: 'AdminPassword123!',
     options: {
       data: {
