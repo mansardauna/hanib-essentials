@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   }, [user, loading, router]);
 
   const handleOPayClick = () => {
-    if (!address || !phone) return alert('Please complete your profile details');
+    if (!address || !phone) return alert('Please provide your Delivery Address and Phone Number.');
     setShowOPayModal(true);
     setPaymentStatus('processing');
     
@@ -47,7 +47,6 @@ export default function CheckoutPage() {
       await updateProfile(address, phone);
     }
     
-    // Calculate totals
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const totalDeliveryFee = cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0);
     const total = subtotal + totalDeliveryFee;
@@ -68,7 +67,6 @@ export default function CheckoutPage() {
       if (!error && data) {
         localStorage.removeItem('hanib_cart_v2');
         
-        // Send order confirmation email
         try {
           await fetch('/api/send-email', {
             method: 'POST',
@@ -79,7 +77,7 @@ export default function CheckoutPage() {
               html: `<h1>Thank you for your order!</h1>
                      <p>Your order <strong>${newOrder.id}</strong> has been received and is currently processing.</p>
                      <p>Total: ₦${total.toLocaleString()}</p>
-                     <p><a href="http://localhost:3000/receipt/${newOrder.id}">View your receipt and QR Code</a></p>`
+                     <p><a href="https://hanib-essentials.vercel.app/receipt/${newOrder.id}">View your receipt and QR Code</a></p>`
             })
           });
         } catch (e) {
@@ -99,219 +97,122 @@ export default function CheckoutPage() {
     }
   };
 
-  if (loading || !user) return <div className="container">Loading...</div>;
+  if (loading || !user) return <div className="min-h-screen flex items-center justify-center font-medium text-slate-500">Loading checkout...</div>;
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalDeliveryFee = cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0);
+  const grandTotal = subtotal + totalDeliveryFee;
 
   return (
-    <main className="container checkout-page">
-      <div className="checkout-grid">
-        <div className="card checkout-form">
-          <h2>Shipping Information</h2>
-          {(!user.address || !user.phone) && (
-            <p className="notice">Please provide your details for this first order.</p>
-          )}
-          <div className="mui-form-group">
-            <input 
-              type="text" 
-              className="mui-input" 
-              placeholder=" " 
-              value={address}
-              onChange={e => setAddress(e.target.value)}
-              required 
-            />
-            <label className="mui-label">Delivery Address</label>
-          </div>
-          <div className="mui-form-group">
-            <input 
-              type="text" 
-              className="mui-input" 
-              placeholder=" " 
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-              required 
-            />
-            <label className="mui-label">Phone Number</label>
+    <main className="max-w-7xl mx-auto px-4 py-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Shipping Form */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100">
+            <h2 className="text-2xl font-semibold text-slate-800 mb-6 uppercase tracking-widest border-b border-slate-100 pb-4">Shipping Information</h2>
+            
+            {(!user.address || !user.phone) && (
+              <div className="p-4 bg-brand-50 text-brand-700 text-sm font-medium rounded-xl border border-brand-100 mb-6">
+                Please provide your details for this first order.
+              </div>
+            )}
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Address</label>
+                <input 
+                  type="text" 
+                  className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
+                  placeholder="E.g., 123 Main Street, City" 
+                  value={address}
+                  onChange={e => setAddress(e.target.value)}
+                  required 
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone Number</label>
+                <input 
+                  type="tel" 
+                  className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
+                  placeholder="E.g., +234 800 000 0000" 
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  required 
+                />
+              </div>
+            </div>
           </div>
         </div>
         
-        <div className="card checkout-summary">
-          <h2>Order Summary</h2>
-          <div className="summary-list">
-            {cart.map(item => (
-              <div key={item.id} className="summary-item">
-                <span>{item.quantity}x {item.name}</span>
-                <span>₦{(item.price * item.quantity).toLocaleString()}</span>
+        {/* Order Summary */}
+        <div className="lg:col-span-1">
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100 sticky top-8">
+            <h2 className="text-xl font-semibold text-slate-800 mb-6 uppercase tracking-widest border-b border-slate-100 pb-4">Order Summary</h2>
+            
+            <div className="space-y-4 mb-6 max-h-64 overflow-y-auto pr-2 scrollbar-hide">
+              {cart.map(item => (
+                <div key={item.id} className="flex justify-between items-center text-sm font-medium text-slate-700">
+                  <span className="flex-1 truncate pr-4">{item.quantity}x {item.name}</span>
+                  <span>₦{(item.price * item.quantity).toLocaleString()}</span>
+                </div>
+              ))}
+              {cart.length === 0 && (
+                <p className="text-slate-500 italic text-sm">Your cart is empty.</p>
+              )}
+            </div>
+            
+            <div className="space-y-3 pt-4 border-t border-slate-100 text-sm font-medium text-slate-600">
+              <div className="flex justify-between">
+                <span>Subtotal:</span>
+                <span>₦{subtotal.toLocaleString()}</span>
               </div>
-            ))}
+              <div className="flex justify-between">
+                <span>Delivery Fees:</span>
+                <span>₦{totalDeliveryFee.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
+                <span className="text-lg font-semibold text-slate-800">Total:</span>
+                <span className="text-2xl font-bold text-brand-600">₦{grandTotal.toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={handleOPayClick} 
+              disabled={cart.length === 0}
+              className="w-full mt-8 py-4 bg-[#17B169] hover:bg-[#128e54] text-white font-bold rounded-2xl shadow-sm transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Pay with OPay
+            </button>
           </div>
-          <div className="summary-totals">
-            <div className="total-row">
-              <span>Subtotal:</span>
-              <span>₦{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}</span>
-            </div>
-            <div className="total-row">
-              <span>Delivery Fees:</span>
-              <span>₦{cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0).toLocaleString()}</span>
-            </div>
-            <div className="total-row grand-total">
-              <span>Total:</span>
-              <span>₦{(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0)).toLocaleString()}</span>
-            </div>
-          </div>
-          <button onClick={handleOPayClick} className="btn opay-btn w-full">Pay with OPay</button>
         </div>
       </div>
       
+      {/* OPay Modal */}
       {showOPayModal && (
-        <div className="opay-overlay">
-          <div className="opay-modal card">
-            <h2 className="opay-logo">OPay</h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl transform transition-all">
+            <h2 className="text-[#17B169] text-4xl font-black tracking-tighter mb-8">OPay</h2>
+            
             {paymentStatus === 'processing' ? (
-              <div className="processing">
-                <div className="spinner"></div>
-                <p>Processing Payment securely...</p>
-                <span className="opay-amount">₦{(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0)).toLocaleString()}</span>
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-slate-100 border-t-[#17B169] rounded-full animate-spin"></div>
+                <p className="font-semibold text-slate-700">Processing Payment securely...</p>
+                <span className="text-3xl font-bold text-slate-800 mt-2">₦{grandTotal.toLocaleString()}</span>
               </div>
             ) : (
-              <div className="success">
-                <div className="checkmark">✔</div>
-                <p>Payment Successful!</p>
-                <span style={{fontSize: '0.875rem', color: 'var(--muted-foreground)'}}>Redirecting to your orders...</span>
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-16 h-16 bg-[#17B169] text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-md">
+                  ✓
+                </div>
+                <p className="text-xl font-bold text-slate-800 mt-2">Payment Successful!</p>
+                <span className="text-sm font-medium text-slate-500">Redirecting to your orders...</span>
               </div>
             )}
           </div>
         </div>
       )}
-      
-      <style jsx>{`
-        .checkout-page {
-          padding: 3rem 1rem;
-        }
-        .checkout-grid {
-          display: grid;
-          grid-template-columns: 2fr 1fr;
-          gap: 2rem;
-        }
-        @media(max-width: 768px) {
-          .checkout-grid { grid-template-columns: 1fr; }
-        }
-        .checkout-form, .checkout-summary {
-          padding: 2rem;
-        }
-        .checkout-form h2, .checkout-summary h2 {
-          text-transform: uppercase;
-          margin-bottom: 1.5rem;
-          border-bottom: 2px solid var(--border);
-          padding-bottom: 0.5rem;
-        }
-        .notice {
-          color: var(--muted-foreground);
-          margin-bottom: 1.5rem;
-          font-style: italic;
-        }
-        .summary-list {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 1.5rem;
-        }
-        .summary-item {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.875rem;
-        }
-        .summary-totals {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-        }
-        .total-row {
-          display: flex;
-          justify-content: space-between;
-        }
-        .grand-total {
-          font-weight: 700;
-          font-size: 1.25rem;
-          margin-top: 1rem;
-          padding-top: 1rem;
-          border-top: 1px solid var(--border);
-        }
-        .w-full { width: 100%; }
-        
-        .opay-btn {
-          background: #17B169; /* OPay Green */
-          color: white;
-          font-weight: 700;
-          font-size: 1.1rem;
-          padding: 1rem;
-          border: none;
-        }
-        .opay-btn:hover {
-          background: #128e54;
-        }
-        .opay-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          backdrop-filter: blur(4px);
-        }
-        .opay-modal {
-          background: #fff;
-          width: 90%;
-          max-width: 400px;
-          padding: 3rem 2rem;
-          text-align: center;
-          border-radius: var(--radius-lg);
-          color: #000;
-        }
-        .opay-logo {
-          color: #17B169;
-          font-size: 2.5rem;
-          margin-bottom: 2rem;
-          font-weight: 900;
-          letter-spacing: -1px;
-        }
-        .processing, .success {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-        }
-        .spinner {
-          width: 40px; height: 40px;
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #17B169;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .opay-amount {
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-top: 1rem;
-        }
-        .checkmark {
-          width: 60px; height: 60px;
-          background: #17B169;
-          color: white;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-          margin-bottom: 1rem;
-        }
-        .success p {
-          font-size: 1.25rem;
-          font-weight: 700;
-        }
-      `}</style>
     </main>
   );
 }
