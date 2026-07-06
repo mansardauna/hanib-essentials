@@ -28,7 +28,7 @@
   body {
     @apply min-h-screen font-sans antialiased;
     color: var(--foreground);
-    background-image: linear-gradient(to right top, #f0f7f7, #daebea, #fff3e0, #ffebee);
+    background-color: var(--background);
   }
 }
 

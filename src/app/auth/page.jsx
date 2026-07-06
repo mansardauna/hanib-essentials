@@ -42,13 +42,13 @@ export default function AuthPage() {
 
   return (
     <main className="min-h-[calc(100vh-80px)] flex flex-col justify-center items-center p-4 sm:p-8">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-xl border border-brand-100">
+      <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-brand-100">
         
         <div className="flex justify-center mb-8">
-          <Image src="/images/logo.png" alt="Hanib Logo" width={140} height={50} className="object-contain" />
+          <Image src="/images/logo.png" alt="Hanib Logo" width={140} height={50} className="object-cover rounded-full" />
         </div>
 
-        <h2 className="text-2xl font-black text-center text-slate-800 mb-8 uppercase tracking-widest">
+        <h2 className="text-2xl font-semibold text-center text-slate-800 mb-8 uppercase tracking-widest">
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
         

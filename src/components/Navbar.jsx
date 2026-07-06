@@ -59,7 +59,7 @@ export default function Navbar() {
               <Menu size={24} />
             </button>
             <Link href="/" className="flex-shrink-0">
-              <Image src="/images/logo.png" alt="Hanib Logo" width={100} height={40} className="object-contain" />
+              <Image src="/images/logo.png" alt="Hanib Logo" width={100} height={40} className="object-cover rounded-full" />
             </Link>
           </div>
           
