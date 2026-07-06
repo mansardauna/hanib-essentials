@@ -109,14 +109,19 @@ export default function Navbar() {
           </form>
           
           <div className="nav-actions">
-            {user?.role !== 'owner' && (
+            {user?.role === 'owner' ? (
+              <Link href="/dashboard" className="btn btn-outline">Dashboard</Link>
+            ) : (
               <button onClick={() => setIsCartOpen(true)} className="btn btn-outline cart-btn">
                 <ShoppingCart size={18} />
                 <span>Cart ({cartCount})</span>
               </button>
             )}
             {user && (
-              <button onClick={logout} className="btn btn-outline logout-btn" title="Logout"><LogOut size={18}/></button>
+              <>
+                {user?.role !== 'owner' && <Link href="/settings" className="btn btn-outline" style={{padding: '0.5rem'}}><Settings size={18}/></Link>}
+                <button onClick={logout} className="btn btn-outline logout-btn" title="Logout"><LogOut size={18}/></button>
+              </>
             )}
           </div>
         </div>
@@ -143,7 +148,7 @@ export default function Navbar() {
             </div>
           </button>
         )}
-        <Link href={user ? "/dashboard" : "/auth"} className="bottom-nav-item">
+        <Link href={user ? (user.role === 'owner' ? "/dashboard" : "/settings") : "/auth"} className="bottom-nav-item">
           <Settings size={28} />
         </Link>
       </nav>
