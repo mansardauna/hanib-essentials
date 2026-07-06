@@ -29,25 +29,24 @@ export default function ProductsManagement() {
   const [categoryForm, setCategoryForm] = useState({ id: '', name: '' });
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
+    const initializeData = async () => {
+      // 1. Fetch Products
+      const { data: prodData } = await supabase.from('products').select('*');
+      const loadedProducts = prodData || [];
+      setProducts(loadedProducts);
+
+      // 2. Fetch Categories (with safe fallback to loaded products)
+      const { data: catData, error: catError } = await supabase.from('categories').select('*').order('created_at', { ascending: true });
+      if (!catError && catData && catData.length > 0) {
+        setCategories(catData);
+      } else {
+        const uniqueCats = [...new Set(loadedProducts.map(p => p.category))].filter(Boolean);
+        setCategories(uniqueCats.map((c, i) => ({ id: `cat_${i}`, name: c })));
+      }
+    };
+    
+    initializeData();
   }, []);
-
-  const fetchProducts = async () => {
-    const { data } = await supabase.from('products').select('*');
-    if (data) setProducts(data);
-  };
-
-  const fetchCategories = async () => {
-    const { data } = await supabase.from('categories').select('*').order('created_at', { ascending: true });
-    if (data) {
-      setCategories(data);
-    } else {
-      // Fallback to extract from products if categories table is empty or missing initially
-      const uniqueCats = [...new Set(products.map(p => p.category))];
-      setCategories(uniqueCats.map((c, i) => ({ id: `cat_${i}`, name: c })));
-    }
-  };
 
   /* --- Product Functions --- */
   const openAddProductModal = () => {
@@ -67,12 +66,19 @@ export default function ProductsManagement() {
   };
 
   const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('Upload failed');
-    const data = await res.json();
-    return data.url;
+    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const { data, error } = await supabase.storage.from('products').upload(filename, file, { 
+      cacheControl: '3600', 
+      upsert: false 
+    });
+    
+    if (error) {
+      console.error("Supabase upload error:", error);
+      throw new Error(`Upload failed: ${error.message}`);
+    }
+    
+    const { data: publicUrlData } = supabase.storage.from('products').getPublicUrl(filename);
+    return publicUrlData.publicUrl;
   };
 
   const handleProductSubmit = async (e) => {
