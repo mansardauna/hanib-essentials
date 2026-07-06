@@ -115,7 +115,7 @@ function ShopContent() {
         <>
           <div className="space-y-6">
             <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">Trending Now</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayedProducts.slice(0, 4).map(product => (
                 <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
               ))}
@@ -125,7 +125,7 @@ function ShopContent() {
           {displayedProducts.length > 4 && (
             <div className="space-y-6 pt-12">
               <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">Discover More Items</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {displayedProducts.slice(4).map(product => (
                   <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
                 ))}
@@ -136,7 +136,7 @@ function ShopContent() {
       ) : (
         <div className="space-y-6">
           <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">{search ? `Search Results for "${search}"` : filter}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {displayedProducts.length === 0 ? (
               <p className="text-slate-500 italic col-span-full text-center py-12 bg-white/50 rounded-3xl font-medium">No products found.</p>
             ) : (
