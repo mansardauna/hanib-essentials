@@ -13,12 +13,15 @@ export const metadata = {
   title: "Hanib Essentials",
   description: "Hanib Essentials - Stationery, back-to-school items, and Household essentials.",
   manifest: "/manifest.json",
-  themeColor: "#5da09b",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Hanib Essentials",
   },
+};
+
+export const viewport = {
+  themeColor: "#5da09b",
 };
 
 import { Suspense } from 'react';
