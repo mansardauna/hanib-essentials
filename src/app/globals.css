@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.js";
 
 @layer base {
   :root {
@@ -23,29 +22,36 @@
   }
 
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-gradient-soft text-foreground min-h-screen font-sans antialiased;
+    @apply min-h-screen font-sans antialiased;
+    color: var(--foreground);
+    background-image: linear-gradient(to right top, #f0f7f7, #daebea, #fff3e0, #ffebee);
   }
 }
 
 @layer components {
-  /* Some legacy component classes mapped to Tailwind just in case they're not fully replaced yet */
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   .card {
-    @apply bg-card text-card-foreground rounded-2xl shadow-sm border border-border;
+    @apply rounded-2xl shadow-sm border;
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-color: var(--border);
   }
   .btn {
-    @apply inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-6 py-2;
+    @apply inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-6 py-2;
   }
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-brand-500 shadow-md hover:shadow-lg;
+    @apply shadow-md hover:shadow-lg;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
   .btn-outline {
-    @apply border border-input bg-transparent hover:bg-accent hover:text-accent-foreground;
+    @apply bg-transparent;
+    border: 1px solid var(--border);
   }
 }
