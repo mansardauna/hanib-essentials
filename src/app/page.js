@@ -16,6 +16,21 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || '';
 
+  // Banner Slider State
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderImages = [
+    '/images/store_bg.png',
+    '/images/banner_stationery.png',
+    '/images/banner_toys.png'
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [sliderImages.length]);
+
   useEffect(() => {
     supabase.from('products').select('*')
       .then(({ data, error }) => {
@@ -63,12 +78,12 @@ function ShopContent() {
     <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 font-sans">
       {/* Banner Section */}
       <section 
-        className="text-white rounded-3xl p-8 md:p-24 relative overflow-hidden flex items-center justify-center min-h-[500px] mb-12 shadow-lg"
-        style={{ backgroundImage: "linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('/images/store_bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+        className="text-white rounded-xl p-8 md:p-16 relative overflow-hidden flex items-center justify-center min-h-[350px] mb-12 shadow-sm transition-all duration-1000 ease-in-out"
+        style={{ backgroundImage: `linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('${sliderImages[currentSlide]}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
-        <div className="relative z-10 text-center space-y-6">
-          <h1 className="text-4xl md:text-7xl font-bold uppercase tracking-widest drop-shadow-lg">Hanib essentials</h1>
-          <p className="text-lg md:text-2xl text-white/90 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+        <div className="relative z-10 text-center space-y-4">
+          <h1 className="text-3xl md:text-6xl font-bold uppercase tracking-widest drop-shadow-sm">Hanib essentials</h1>
+          <p className="text-base md:text-xl text-white/90 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
             We sell Stationery, back-to-school items, and Household essentials.
           </p>
         </div>
