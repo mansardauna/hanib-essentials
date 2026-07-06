@@ -1,187 +1,51 @@
-:root {
-  --primary: #5da09b;
-  --primary-foreground: #FFFFFF;
-  --secondary: #f5a073;
-  --secondary-foreground: #FFFFFF;
-  
-  /* Cream and Milk Gray Aesthetic */
-  --background: #FAFAF7; /* Light cream */
-  --foreground: #2b2b2b;
-  --card: #FFFFFF;
-  --card-foreground: #2b2b2b;
-  --border: #E5E5DF; /* Very soft milk gray */
-  --muted: #F3F3F0; /* Soft gray-cream */
-  --muted-foreground: #8a8a8a;
-  
-  --destructive: #E74C3C;
-  --destructive-foreground: #FFFFFF;
-  --ring: rgba(44, 62, 80, 0.1);
-  
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-  --radius-full: 9999px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.06);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #1a1a19;
-    --foreground: #f4f4f4;
-    --card: #222221;
-    --card-foreground: #f4f4f4;
-    --border: #333333;
-    --muted: #2a2a29;
-    --muted-foreground: #a0a0a0;
-    --primary: #F0F3F4;
-    --primary-foreground: #1a1a19;
-    --secondary: #2C3E50;
-    --secondary-foreground: #E8F8F5;
+    --background: #fdfbf7;
+    --foreground: #1e293b;
+    --card: #ffffff;
+    --card-foreground: #1e293b;
+    --primary: #5da09b;
+    --primary-foreground: #ffffff;
+    --secondary: #ff8a4c;
+    --secondary-foreground: #ffffff;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --border: #e2e8f0;
+    --ring: #5da09b;
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-full: 9999px;
   }
-}
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  * {
+    @apply border-border;
+  }
 
-body {
-  font-family: var(--font-poppins), sans-serif;
-  background-color: var(--background);
-  color: var(--foreground);
-  min-height: 100vh;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-@media(max-width: 768px) {
   body {
-    padding-bottom: 70px;
+    @apply bg-gradient-soft text-foreground min-h-screen font-sans antialiased;
   }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font: inherit;
-  font-family: var(--font-poppins), sans-serif;
-}
-
-/* Utilities */
-.container {
-  width: 100%;
-  max-width: 1250px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
-
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.gap-2 { gap: 0.5rem; }
-.gap-4 { gap: 1rem; }
-.gap-8 { gap: 2rem; }
-
-/* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-full);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-primary {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  border: 1px solid var(--primary);
-}
-
-.btn-primary:hover {
-  background-color: transparent;
-  color: var(--primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  border: 1px solid var(--border);
-  color: var(--foreground);
-  background-color: var(--card);
-}
-
-.btn-outline:hover {
-  background-color: var(--muted);
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-/* Cards */
-.card {
-  background-color: var(--card);
-  color: var(--card-foreground);
-  border-radius: var(--radius-lg);
-  border: none;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-4px);
-}
-
-/* Material UI Form Styles modified for softer look */
-.mui-form-group {
-  position: relative;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-}
-
-.mui-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  color: var(--foreground);
-  background-color: var(--muted);
-  border: 1px solid transparent;
-  outline: none;
-  transition: all 0.3s ease;
-  border-radius: var(--radius-md);
-  font-family: var(--font-poppins), sans-serif;
-}
-
-.mui-input:focus {
-  background-color: var(--card);
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--ring);
-}
-
-.mui-label {
-  position: absolute;
-  top: -0.5rem;
-  left: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  pointer-events: none;
-  transition: 0.2s ease all;
-  font-weight: 500;
+@layer components {
+  /* Some legacy component classes mapped to Tailwind just in case they're not fully replaced yet */
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .card {
+    @apply bg-card text-card-foreground rounded-2xl shadow-sm border border-border;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-6 py-2;
+  }
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-brand-500 shadow-md hover:shadow-lg;
+  }
+  .btn-outline {
+    @apply border border-input bg-transparent hover:bg-accent hover:text-accent-foreground;
+  }
 }

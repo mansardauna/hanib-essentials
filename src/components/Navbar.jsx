@@ -52,75 +52,73 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="navbar">
-        <div className="container flex items-center justify-between">
-          <div className="nav-left">
-            <button onClick={() => setIsSidebarOpen(true)} className="menu-btn">
+      <header className="h-20 flex items-center bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-brand-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="text-slate-700 hover:text-brand-500 transition-colors">
               <Menu size={24} />
             </button>
-            <Link href="/" className="logo-link">
-              <Image src="/images/logo.png" alt="Hanib Logo" width={100} height={40} className="logo-img" />
+            <Link href="/" className="flex-shrink-0">
+              <Image src="/images/logo.png" alt="Hanib Logo" width={100} height={40} className="object-contain" />
             </Link>
           </div>
           
-          <form className="nav-center" onSubmit={handleSearch}>
-            <div className="search-wrapper">
-              <div className="search-box">
-                <Search size={18} className="search-icon" />
-                <input 
-                  type="text" 
-                  placeholder="Search products..." 
-                  value={searchTerm}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSearchTerm(val);
-                    setShowDropdown(val.length > 0);
-                    if (val) {
-                      router.push(`/?search=${encodeURIComponent(val)}`);
-                    } else {
-                      router.push(`/`);
-                    }
-                  }}
-                  onFocus={() => { if (searchTerm) setShowDropdown(true); }}
-                  onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                  className="search-input"
-                />
-              </div>
-              
-              {showDropdown && (
-                <div className="search-dropdown">
-                  {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(prod => (
-                    <Link key={prod.id} href={`/product/${prod.id}`} className="dropdown-item">
-                      <div className="dropdown-img">
-                        {prod.image ? <Image src={prod.image} alt={prod.name} width={40} height={40} style={{objectFit: 'cover'}}/> : <span className="placeholder">{prod.name.charAt(0)}</span>}
-                      </div>
-                      <div className="dropdown-info">
-                        <span className="dropdown-name">{prod.name}</span>
-                        <span className="dropdown-price">₦{prod.price.toLocaleString()}</span>
-                      </div>
-                    </Link>
-                  ))}
-                  {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
-                    <div className="dropdown-empty">No results found.</div>
-                  )}
-                </div>
-              )}
+          <form className="hidden md:flex justify-center px-4 flex-1 max-w-lg relative" onSubmit={handleSearch}>
+            <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 py-2 w-full shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">
+              <Search size={18} className="text-slate-400 mr-2" />
+              <input 
+                type="text" 
+                placeholder="Search products..." 
+                value={searchTerm}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSearchTerm(val);
+                  setShowDropdown(val.length > 0);
+                  if (val) {
+                    router.push(`/?search=${encodeURIComponent(val)}`);
+                  } else {
+                    router.push(`/`);
+                  }
+                }}
+                onFocus={() => { if (searchTerm) setShowDropdown(true); }}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                className="bg-transparent border-none outline-none w-full text-sm text-slate-700"
+              />
             </div>
+            
+            {showDropdown && (
+              <div className="absolute top-full mt-2 left-4 right-4 bg-white border border-slate-200 rounded-xl shadow-xl max-h-96 overflow-y-auto z-50">
+                {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 5).map(prod => (
+                  <Link key={prod.id} href={`/product/${prod.id}`} className="flex items-center px-6 py-4 gap-4 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div className="w-10 h-10 bg-slate-100 rounded-md flex items-center justify-center overflow-hidden shrink-0">
+                      {prod.image ? <Image src={prod.image} alt={prod.name} width={40} height={40} className="object-cover"/> : <span className="font-bold text-slate-400">{prod.name.charAt(0)}</span>}
+                    </div>
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="font-semibold text-sm truncate text-slate-800">{prod.name}</span>
+                      <span className="text-brand-600 text-xs font-bold">₦{prod.price.toLocaleString()}</span>
+                    </div>
+                  </Link>
+                ))}
+                {allProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                  <div className="p-4 text-center text-slate-500 text-sm">No results found.</div>
+                )}
+              </div>
+            )}
           </form>
           
-          <div className="nav-actions">
+          <div className="flex items-center gap-4">
             {user?.role === 'owner' ? (
-              <Link href="/dashboard" className="btn btn-outline">Dashboard</Link>
+              <Link href="/dashboard" className="hidden md:inline-flex px-5 py-2 border border-brand-200 text-brand-600 rounded-full hover:bg-brand-50 font-medium transition-colors text-sm">Dashboard</Link>
             ) : (
-              <button onClick={() => setIsCartOpen(true)} className="btn btn-outline cart-btn">
-                <ShoppingCart size={18} />
+              <button onClick={() => setIsCartOpen(true)} className="hidden md:inline-flex items-center gap-2 px-5 py-2 border border-slate-200 rounded-full hover:bg-slate-50 text-slate-700 font-medium transition-colors text-sm hover:border-brand-300">
+                <ShoppingCart size={18} className="text-brand-500"/>
                 <span>Cart ({cartCount})</span>
               </button>
             )}
             {user && (
               <>
-                {user?.role !== 'owner' && <Link href="/settings" className="btn btn-outline" style={{padding: '0.5rem'}}><Settings size={18}/></Link>}
-                <button onClick={logout} className="btn btn-outline logout-btn" title="Logout"><LogOut size={18}/></button>
+                {user?.role !== 'owner' && <Link href="/settings" className="hidden md:inline-flex p-2 text-slate-600 hover:text-brand-500 hover:bg-slate-50 rounded-full transition-colors"><Settings size={20}/></Link>}
+                <button onClick={logout} className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors" title="Logout"><LogOut size={20}/></button>
               </>
             )}
           </div>
@@ -133,236 +131,31 @@ export default function Navbar() {
       )}
 
       {/* Mobile Bottom Navigation */}
-      <nav className="mobile-bottom-nav">
-        <Link href="/" className="bottom-nav-item">
-          <Home size={28} />
+      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-white border-t border-slate-200 z-[1000] shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex items-center justify-around pb-safe">
+        <Link href="/" className="flex-1 h-full flex flex-col items-center justify-center text-slate-500 hover:text-brand-500 transition-colors">
+          <Home size={24} />
+          <span className="text-[10px] mt-1 font-medium">Home</span>
         </Link>
-        <button className="bottom-nav-item" onClick={() => document.querySelector('.search-input')?.focus()}>
-          <Search size={28} />
+        <button className="flex-1 h-full flex flex-col items-center justify-center text-slate-500 hover:text-brand-500 transition-colors" onClick={() => {
+          setIsSidebarOpen(true); // Open sidebar on mobile instead since search bar is hidden
+        }}>
+          <Search size={24} />
+          <span className="text-[10px] mt-1 font-medium">Search</span>
         </button>
         {user?.role !== 'owner' && (
-          <button className="bottom-nav-item" onClick={() => setIsCartOpen(true)}>
-            <div className="cart-icon-wrapper">
-              <ShoppingCart size={28} />
-              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          <button className="flex-1 h-full flex flex-col items-center justify-center text-slate-500 hover:text-brand-500 transition-colors" onClick={() => setIsCartOpen(true)}>
+            <div className="relative flex items-center justify-center">
+              <ShoppingCart size={24} />
+              {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none">{cartCount}</span>}
             </div>
+            <span className="text-[10px] mt-1 font-medium">Cart</span>
           </button>
         )}
-        <Link href={user ? (user.role === 'owner' ? "/dashboard" : "/settings") : "/auth"} className="bottom-nav-item">
-          <Settings size={28} />
+        <Link href={user ? (user.role === 'owner' ? "/dashboard" : "/settings") : "/auth"} className="flex-1 h-full flex flex-col items-center justify-center text-slate-500 hover:text-brand-500 transition-colors">
+          <Settings size={24} />
+          <span className="text-[10px] mt-1 font-medium">{user?.role === 'owner' ? 'Admin' : 'Settings'}</span>
         </Link>
       </nav>
-
-      <style jsx>{`
-        .navbar {
-          height: 80px;
-          display: flex;
-          align-items: center;
-          background: rgba(250, 250, 247, 0.8);
-          backdrop-filter: blur(10px);
-          position: sticky;
-          top: 0;
-          z-index: 50;
-        }
-        .nav-left {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-        .menu-btn {
-          color: var(--foreground);
-        }
-        .logo-img {
-          object-fit: contain;
-        }
-        .nav-center {
-          display: flex;
-          justify-content: center;
-          padding: 0 1rem;
-          flex: 0 1 500px;
-        }
-        .search-wrapper {
-          position: relative;
-          width: 100%;
-          max-width: 500px;
-        }
-        .search-box {
-          display: flex;
-          align-items: center;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-full);
-          padding: 0.5rem 1rem;
-          width: 100%;
-          box-shadow: var(--shadow-sm);
-          transition: all 0.3s ease;
-        }
-        .search-box:focus-within {
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px var(--ring);
-        }
-        .search-icon {
-          color: var(--muted-foreground);
-          margin-right: 0.5rem;
-        }
-        .search-input {
-          border: none;
-          outline: none;
-          background: transparent;
-          width: 100%;
-          font-family: var(--font-poppins);
-          font-size: 0.875rem;
-          color: var(--foreground);
-        }
-        .search-dropdown {
-          position: absolute;
-          top: calc(100% + 0.5rem);
-          left: 0;
-          width: 100%;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          box-shadow: var(--shadow-md);
-          max-height: 400px;
-          overflow-y: auto;
-          z-index: 100;
-        }
-        .dropdown-item {
-          display: flex;
-          align-items: center;
-          padding: 1rem 1.5rem;
-          gap: 1.25rem;
-          border-bottom: 1px solid var(--border);
-          transition: background 0.2s;
-        }
-        .dropdown-item:hover {
-          background: var(--muted);
-        }
-        .dropdown-img {
-          width: 40px; height: 40px;
-          background: var(--muted);
-          border-radius: var(--radius-sm);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-        .placeholder {
-          font-weight: 700;
-          color: var(--muted-foreground);
-        }
-        .dropdown-info {
-          display: flex;
-          flex-direction: column;
-        }
-        .dropdown-name {
-          font-weight: 600;
-          font-size: 0.9rem;
-          margin-bottom: 0.2rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 300px;
-        }
-        .dropdown-price {
-          color: var(--primary);
-          font-size: 0.75rem;
-          font-weight: 700;
-        }
-        .dropdown-empty {
-          padding: 1rem;
-          text-align: center;
-          color: var(--muted-foreground);
-          font-size: 0.875rem;
-        }
-        .nav-actions {
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-        }
-        .cart-btn {
-          gap: 0.5rem;
-          border: none;
-        }
-        .cart-btn:hover {
-          background: transparent;
-          text-decoration: underline;
-        }
-        .logout-btn {
-          border: none;
-        }
-        .logout-btn:hover {
-          background: transparent;
-          color: red;
-        }
-
-        /* Mobile Bottom Nav */
-        .mobile-bottom-nav {
-          display: none;
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 64px;
-          background: var(--card);
-          border-top: 1px solid var(--border);
-          z-index: 1000;
-          box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-          padding-bottom: env(safe-area-inset-bottom);
-          align-items: center;
-          justify-content: space-around;
-        }
-        .bottom-nav-item {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          flex: 1;
-          color: var(--muted-foreground);
-          text-decoration: none;
-          background: none;
-          border: none;
-          cursor: pointer;
-          margin: 0;
-          padding: 0;
-        }
-        .bottom-nav-item:hover, .bottom-nav-item:active {
-          color: var(--primary);
-        }
-        .cart-icon-wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .cart-badge {
-          position: absolute;
-          top: -4px;
-          right: -8px;
-          background: red;
-          color: white;
-          border-radius: 50%;
-          padding: 0.15rem 0.35rem;
-          font-size: 0.65rem;
-          font-weight: bold;
-          line-height: 1;
-        }
-
-        @media(max-width: 768px) {
-          .mobile-bottom-nav {
-            display: flex;
-          }
-          .nav-actions .cart-btn {
-            display: none;
-          }
-          .nav-center {
-            padding: 0;
-          }
-          .search-input {
-            width: 120px;
-          }
-        }
-      `}</style>
     </>
   );
 }

@@ -25,7 +25,7 @@ function ShopContent() {
   }, []);
 
   const addToCart = (product, e) => {
-    e.preventDefault(); // Prevent navigating to detail page if clicked inside link
+    e.preventDefault(); 
     if (product.stock <= 0) return alert('Out of stock!');
     
     const savedCart = localStorage.getItem('hanib_cart_v2');
@@ -60,22 +60,23 @@ function ShopContent() {
   }
 
   return (
-    <main className="shop-container">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
       {/* Banner Section */}
-      <section className="banner">
-        <div className="banner-content">
-          <h1>Hanibessentials</h1>
-          <p>We sell Stationery, back-to-school items, and Household essentials.</p>
+      <section className="bg-gradient-colorful text-white rounded-3xl p-8 md:p-16 shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
+        <div className="relative z-10 text-center space-y-4">
+          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-widest drop-shadow-md">Hanibessentials</h1>
+          <p className="text-lg md:text-2xl text-white/90 font-medium">Stationery, back-to-school items, and Household essentials.</p>
         </div>
       </section>
 
       {/* Filter & Sort Row */}
-      <div className="filter-sort-row">
-        <div className="filter-bar">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/60 backdrop-blur-md p-4 rounded-3xl shadow-sm border border-brand-100">
+        <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-hide">
           {categories.map(cat => (
             <button 
               key={cat} 
-              className={`filter-btn ${filter === cat ? 'active' : ''}`}
+              className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all shadow-sm ${filter === cat ? 'bg-gradient-brand text-white shadow-md transform -translate-y-0.5' : 'bg-white text-slate-600 hover:bg-brand-50 border border-brand-100 hover:text-brand-600'}`}
               onClick={() => setFilter(cat)}
             >
               {cat}
@@ -83,7 +84,7 @@ function ShopContent() {
           ))}
         </div>
         
-        <select value={sort} onChange={e => setSort(e.target.value)} className="sort-select">
+        <select value={sort} onChange={e => setSort(e.target.value)} className="w-full md:w-56 px-5 py-2.5 bg-white border border-brand-100 rounded-full shadow-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-400">
           <option value="">Sort By</option>
           <option value="price-asc">Price: Low to High</option>
           <option value="price-desc">Price: High to Low</option>
@@ -93,355 +94,95 @@ function ShopContent() {
 
       {filter === 'All' && !search ? (
         <>
-          <div className="category-section">
-            <h2 className="section-title">Trending Now</h2>
-            <div className="products-grid">
+          <div className="space-y-6">
+            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-brand inline-block">Trending Now</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {displayedProducts.slice(0, 4).map(product => (
-                <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
-                  <div className="product-img">
-                    {product.image ? (
-                      <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
-                    ) : (
-                      <span>{product.name.charAt(0)}</span>
-                    )}
-                    {product.specialOffer && <div className="badge">OFFER</div>}
-                  </div>
-                  <div className="product-info">
-                    <p className="category-tag">{product.category}</p>
-                    <h3 className="title" title={product.name}>{product.name}</h3>
-                    {product.description && (
-                      <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
-                    )}
-                    <div className="price-row">
-                      <span className="price">₦{product.price.toLocaleString()}</span>
-                      <span className="delivery">
-                        {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
-                      </span>
-                    </div>
-                    <div className="stock-info">
-                      {product.stock > 0 ? (
-                        <span className="in-stock">{product.stock} available</span>
-                      ) : (
-                        <span className="out-of-stock">Out of stock</span>
-                      )}
-                    </div>
-                    {user?.role !== 'owner' && (
-                      <button 
-                        onClick={(e) => addToCart(product, e)} 
-                        className="btn btn-primary add-btn"
-                        disabled={product.stock <= 0}
-                      >
-                        {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
-                      </button>
-                    )}
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
               ))}
             </div>
           </div>
 
           {displayedProducts.length > 4 && (
-            <div className="category-section" style={{marginTop: '4rem'}}>
-              <h2 className="section-title">Discover More Items</h2>
-              <div className="products-grid">
+            <div className="space-y-6 pt-8">
+              <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-brand inline-block">Discover More Items</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {displayedProducts.slice(4).map(product => (
-                  <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
-                    <div className="product-img">
-                      {product.image ? (
-                        <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
-                      ) : (
-                        <span>{product.name.charAt(0)}</span>
-                      )}
-                      {product.specialOffer && <div className="badge">OFFER</div>}
-                    </div>
-                    <div className="product-info">
-                      <p className="category-tag">{product.category}</p>
-                      <h3 className="title" title={product.name}>{product.name}</h3>
-                      {product.description && (
-                        <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
-                      )}
-                      <div className="price-row">
-                        <span className="price">₦{product.price.toLocaleString()}</span>
-                        <span className="delivery">
-                          {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
-                        </span>
-                      </div>
-                      <div className="stock-info">
-                        {product.stock > 0 ? (
-                          <span className="in-stock">{product.stock} available</span>
-                        ) : (
-                          <span className="out-of-stock">Out of stock</span>
-                        )}
-                      </div>
-                      {user?.role !== 'owner' && (
-                        <button 
-                          onClick={(e) => addToCart(product, e)} 
-                          className="btn btn-primary add-btn"
-                          disabled={product.stock <= 0}
-                        >
-                          {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
-                        </button>
-                      )}
-                    </div>
-                  </Link>
+                  <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
                 ))}
               </div>
             </div>
           )}
         </>
       ) : (
-        <div className="category-section">
-          <h2 className="section-title">{search ? `Search Results for "${search}"` : filter}</h2>
-          <div className="products-grid">
+        <div className="space-y-6">
+          <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-brand inline-block">{search ? `Search Results for "${search}"` : filter}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {displayedProducts.length === 0 ? (
-              <p>No products found.</p>
+              <p className="text-slate-500 italic col-span-full text-center py-12 bg-white/50 rounded-3xl font-medium">No products found.</p>
             ) : (
               displayedProducts.map(product => (
-                <Link href={`/product/${product.id}`} key={product.id} className="card product-card">
-                  <div className="product-img">
-                    {product.image ? (
-                      <Image src={product.image} alt={product.name} fill style={{objectFit: 'contain', padding: '1rem'}} />
-                    ) : (
-                      <span>{product.name.charAt(0)}</span>
-                    )}
-                    {product.specialOffer && <div className="badge">OFFER</div>}
-                  </div>
-                  <div className="product-info">
-                    <p className="category-tag">{product.category}</p>
-                    <h3 className="title" title={product.name}>{product.name}</h3>
-                    {product.description && (
-                      <p className="description-tag" style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{product.description}</p>
-                    )}
-                    <div className="price-row">
-                      <span className="price">₦{product.price.toLocaleString()}</span>
-                      <span className="delivery">
-                        {product.deliveryFee === 0 ? 'Free Delivery' : `+₦${product.deliveryFee} Del`}
-                      </span>
-                    </div>
-                    <div className="stock-info">
-                      {product.stock > 0 ? (
-                        <span className="in-stock">{product.stock} available</span>
-                      ) : (
-                        <span className="out-of-stock">Out of stock</span>
-                      )}
-                    </div>
-                    {user?.role !== 'owner' && (
-                      <button 
-                        onClick={(e) => addToCart(product, e)} 
-                        className="btn btn-primary add-btn"
-                        disabled={product.stock <= 0}
-                      >
-                        {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
-                      </button>
-                    )}
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
               ))
             )}
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        .shop-container {
-          padding: 2rem 1rem;
-          max-width: 1400px;
-          margin: 0 auto;
-        }
-        .banner {
-          background-image: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('/images/store_bg.png');
-          background-size: cover;
-          background-position: center;
-          color: var(--primary-foreground);
-          padding: 6rem 2rem;
-          text-align: center;
-          border-radius: var(--radius-xl);
-          margin-bottom: 3rem;
-          box-shadow: var(--shadow-md);
-        }
-        .banner-content h1 {
-          font-size: 3rem;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin-bottom: 1rem;
-        }
-        .banner-content p {
-          font-size: 1.25rem;
-          color: #a0a0a0;
-        }
-        @media (max-width: 768px) {
-          .banner {
-            padding: 3rem 1rem;
-          }
-          .banner-content h1 {
-            font-size: 2rem;
-          }
-          .banner-content p {
-            font-size: 1rem;
-          }
-        }
-        .filter-sort-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 2rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-        .sort-select {
-          border: 1px solid var(--border);
-          border-radius: var(--radius-full);
-          padding: 0.75rem 1.25rem;
-          font-size: 1rem;
-          font-family: var(--font-poppins);
-          background: var(--card);
-          color: var(--foreground);
-          outline: none;
-          min-width: 200px;
-          box-shadow: var(--shadow-sm);
-        }
-        @media (max-width: 768px) {
-          .sort-select {
-            width: 100%;
-          }
-        }
-        .filter-bar {
-          display: flex;
-          gap: 1rem;
-          overflow-x: auto;
-          flex: 1;
-        }
-        .filter-btn {
-          padding: 0.75rem 1.5rem;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-full);
-          font-weight: 500;
-          text-transform: capitalize;
-          white-space: nowrap;
-          box-shadow: var(--shadow-sm);
-          transition: all 0.3s;
-        }
-        .filter-btn:hover {
-          background: var(--muted);
-          transform: translateY(-2px);
-        }
-        .filter-btn.active {
-          background: var(--primary);
-          color: var(--primary-foreground);
-          border-color: var(--primary);
-        }
-        .section-title {
-          font-size: 1.75rem;
-          margin-bottom: 1.5rem;
-          font-weight: 600;
-        }
-        .products-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1.5rem;
-        }
-        @media (max-width: 1024px) {
-          .products-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-        @media (max-width: 600px) {
-          .products-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-        .product-card {
-          display: flex;
-          flex-direction: column;
-          color: inherit;
-        }
-        .product-img {
-          height: 240px;
-          background: var(--card);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          border-bottom: 1px solid var(--border);
-        }
-        .badge {
-          position: absolute;
-          top: 1rem;
-          left: 1rem;
-          background: var(--destructive);
-          color: var(--destructive-foreground);
-          padding: 0.25rem 0.75rem;
-          border-radius: var(--radius-full);
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          z-index: 10;
-        }
-        .product-info {
-          padding: 1.5rem;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-        .category-tag {
-          font-size: 0.75rem;
-          color: var(--secondary-foreground);
-          font-weight: 600;
-          text-transform: uppercase;
-          margin-bottom: 0.5rem;
-        }
-        .title {
-          font-size: 1.1rem;
-          margin-bottom: 1rem;
-          font-weight: 600;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .price-row {
-          display: flex;
-          flex-direction: column;
-          margin-top: auto;
-          margin-bottom: 0.5rem;
-        }
-        .price {
-          font-size: 1.25rem;
-          font-weight: 700;
-        }
-        .delivery {
-          font-size: 0.75rem;
-          color: var(--muted-foreground);
-        }
-        .stock-info {
-          font-size: 0.75rem;
-          margin-bottom: 1rem;
-        }
-        .in-stock {
-          color: var(--foreground);
-        }
-        .out-of-stock {
-          color: red;
-          font-weight: 600;
-        }
-        .add-btn {
-          width: 100%;
-        }
-        .add-btn:disabled {
-          background: var(--muted);
-          color: var(--muted-foreground);
-          border-color: var(--border);
-          cursor: not-allowed;
-        }
-      `}</style>
     </main>
+  );
+}
+
+function ProductCard({ product, addToCart, user }) {
+  return (
+    <Link href={`/product/${product.id}`} className="group flex flex-col bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-brand-100 hover:border-brand-300 transform hover:-translate-y-1">
+      <div className="relative h-64 bg-gradient-to-br from-brand-50 to-white flex items-center justify-center p-6 border-b border-brand-50 group-hover:bg-white transition-colors">
+        {product.image ? (
+          <Image src={product.image} alt={product.name} fill className="object-contain p-6 group-hover:scale-110 transition-transform duration-500" />
+        ) : (
+          <span className="text-5xl font-black text-brand-200">{product.name.charAt(0)}</span>
+        )}
+        {product.specialOffer && <div className="absolute top-4 left-4 bg-vibrant-pink text-white text-xs font-black px-4 py-1.5 rounded-full shadow-md uppercase tracking-wider">Offer</div>}
+      </div>
+      
+      <div className="p-6 flex flex-col flex-1 gap-2">
+        <p className="text-xs font-black text-brand-500 uppercase tracking-widest">{product.category}</p>
+        <h3 className="text-lg font-bold text-slate-800 line-clamp-2 group-hover:text-brand-600 transition-colors">{product.name}</h3>
+        {product.description && (
+          <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{product.description}</p>
+        )}
+        
+        <div className="mt-auto pt-4 flex flex-col gap-1">
+          <span className="text-2xl font-black text-slate-800">₦{product.price.toLocaleString()}</span>
+          <span className="text-xs font-bold text-slate-400">
+            {product.deliveryFee === 0 ? '🎉 Free Delivery' : `🚚 +₦${product.deliveryFee} Del`}
+          </span>
+        </div>
+        
+        <div className="text-xs font-bold mt-2 mb-4">
+          {product.stock > 0 ? (
+            <span className="text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">{product.stock} available</span>
+          ) : (
+            <span className="text-red-700 bg-red-100 px-2.5 py-1 rounded-md">Out of stock</span>
+          )}
+        </div>
+        
+        {user?.role !== 'owner' && (
+          <button 
+            onClick={(e) => addToCart(product, e)} 
+            className={`w-full py-3 rounded-2xl font-bold text-sm transition-all shadow-sm ${product.stock > 0 ? 'bg-gradient-brand text-white hover:shadow-lg hover:scale-[1.02]' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
+            disabled={product.stock <= 0}
+          >
+            {product.stock > 0 ? 'Add to Cart' : 'Unavailable'}
+          </button>
+        )}
+      </div>
+    </Link>
   );
 }
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="container" style={{padding: '4rem 1rem'}}>Loading...</div>}>
+    <Suspense fallback={<div className="max-w-7xl mx-auto p-16 text-center text-brand-500 animate-pulse font-bold text-xl">Loading amazing products...</div>}>
       <ShopContent />
     </Suspense>
   );
