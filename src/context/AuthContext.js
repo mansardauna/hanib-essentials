@@ -62,7 +62,12 @@ export function AuthProvider({ children }) {
           data: { username, role, address: '', phone: '' }
         }
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('already registered')) {
+          throw new Error('This account already exists. Please try logging in instead.');
+        }
+        throw error;
+      }
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message || 'Registration failed' };
