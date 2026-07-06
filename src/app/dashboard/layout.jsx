@@ -16,66 +16,44 @@ export default function DashboardLayout({ children }) {
     }
   }, [user, loading, router]);
 
-  if (loading || !user) return <div className="container" style={{padding: '4rem 1rem'}}>Loading...</div>;
+  if (loading || !user) return <div className="min-h-screen flex items-center justify-center font-medium text-slate-500">Loading dashboard...</div>;
 
   return (
-    <div className="dashboard-container">
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <h2>Store Owner</h2>
+    <div className="flex min-h-[calc(100vh-80px)] bg-slate-50">
+      
+      {/* Dashboard Sidebar */}
+      <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col flex-shrink-0">
+        <div className="p-8 border-b border-slate-100">
+          <h2 className="text-xl font-bold tracking-widest text-slate-800 uppercase">Store Owner</h2>
         </div>
-        <nav className="sidebar-nav">
-          <Link href="/dashboard"><LayoutDashboard size={20}/> Overview</Link>
-          <Link href="/dashboard/products"><ShoppingBag size={20}/> Products</Link>
-          <Link href="/dashboard/orders"><ShoppingBag size={20}/> Orders</Link>
-          <Link href="/dashboard/finances"><DollarSign size={20}/> Finances</Link>
+        
+        <nav className="flex-1 flex flex-col gap-2 p-6">
+          <Link href="/dashboard" className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <LayoutDashboard size={20} className="shrink-0" />
+            <span>Overview</span>
+          </Link>
+          <Link href="/dashboard/products" className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <ShoppingBag size={20} className="shrink-0" />
+            <span>Products</span>
+          </Link>
+          <Link href="/dashboard/orders" className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <ShoppingBag size={20} className="shrink-0" />
+            <span>Orders</span>
+          </Link>
+          <Link href="/dashboard/finances" className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <DollarSign size={20} className="shrink-0" />
+            <span>Finances</span>
+          </Link>
         </nav>
       </aside>
-      <main className="dashboard-main">
-        {children}
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
+          {children}
+        </div>
       </main>
       
-      <style jsx>{`
-        .dashboard-container {
-          display: flex;
-          min-height: calc(100vh - 80px);
-        }
-        .sidebar {
-          width: 250px;
-          background: var(--card);
-          border-right: 1px solid var(--border);
-          padding: 2rem 1rem;
-        }
-        .sidebar-header {
-          margin-bottom: 2rem;
-          padding-left: 1rem;
-        }
-        .sidebar-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .sidebar-nav a {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 0.75rem 1rem;
-          border-radius: var(--radius-md);
-          color: var(--muted-foreground);
-          font-weight: 500;
-          transition: all 0.2s;
-        }
-        .sidebar-nav a:hover {
-          background: var(--muted);
-          color: var(--primary);
-        }
-        .dashboard-main {
-          flex: 1;
-          padding: 2rem;
-          background: var(--background);
-          overflow-y: auto;
-        }
-      `}</style>
     </div>
   );
 }

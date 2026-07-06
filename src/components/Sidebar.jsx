@@ -10,105 +10,77 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      {isOpen && <div className="sidebar-overlay" onClick={onClose}></div>}
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <h2>MENU</h2>
-          <button onClick={onClose} className="btn-close"><X /></button>
+      {/* Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity backdrop-blur-sm" 
+          onClick={onClose}
+        ></div>
+      )}
+      
+      {/* Sidebar Panel */}
+      <aside 
+        className={`fixed top-0 left-0 h-screen w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex justify-between items-center px-6 py-8 border-b border-slate-100">
+          <h2 className="text-xl font-bold tracking-widest text-slate-800 uppercase">Menu</h2>
+          <button onClick={onClose} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+            <X size={24} />
+          </button>
         </div>
-        <nav className="sidebar-nav">
-          <Link href="/" onClick={onClose}><Home size={20}/> Home</Link>
+        
+        <nav className="flex-1 flex flex-col gap-2 p-6 overflow-y-auto">
+          <Link href="/" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <Home size={20} className="shrink-0" />
+            <span>Home</span>
+          </Link>
           
           {user?.role === 'customer' && (
             <>
-              <Link href="/track-order" onClick={onClose}><ShoppingBag size={20}/> My Orders</Link>
-              <Link href="/wishlist" onClick={onClose}><Heart size={20}/> Wishlist</Link>
+              <Link href="/track-order" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+                <ShoppingBag size={20} className="shrink-0" />
+                <span>My Orders</span>
+              </Link>
+              <Link href="/wishlist" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+                <Heart size={20} className="shrink-0" />
+                <span>Wishlist</span>
+              </Link>
             </>
           )}
           
           {user?.role === 'owner' && (
-            <Link href="/dashboard" onClick={onClose}><LayoutDashboard size={20}/> Dashboard</Link>
+            <Link href="/dashboard" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+              <LayoutDashboard size={20} className="shrink-0" />
+              <span>Dashboard</span>
+            </Link>
           )}
           
-          <Link href="/help" onClick={onClose}><HelpCircle size={20}/> Help Center</Link>
-          <Link href="/settings" onClick={onClose}><Settings size={20}/> Settings</Link>
+          <Link href="/help" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <HelpCircle size={20} className="shrink-0" />
+            <span>Help Center</span>
+          </Link>
+          <Link href="/settings" onClick={onClose} className="flex items-center gap-4 px-4 py-3 font-semibold text-sm uppercase text-slate-600 rounded-xl hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <Settings size={20} className="shrink-0" />
+            <span>Settings</span>
+          </Link>
           
-          <div style={{marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1rem'}}>
+          <div className="mt-auto pt-6 border-t border-slate-100">
             {user ? (
-              <div className="user-info">
-                <span>Logged in as <strong>{user.username}</strong></span>
+              <div className="flex flex-col">
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Logged in as</span>
+                <span className="text-sm font-semibold text-slate-800">{user.username}</span>
               </div>
             ) : (
-              <Link href="/auth" onClick={onClose} className="btn btn-outline" style={{width: '100%', display: 'flex'}}><UserIcon size={20}/> Login</Link>
+              <Link href="/auth" onClick={onClose} className="flex items-center justify-center gap-2 w-full py-3.5 bg-slate-800 text-white rounded-xl font-semibold shadow-sm hover:bg-slate-900 transition-colors">
+                <UserIcon size={20} className="shrink-0" />
+                <span>Login</span>
+              </Link>
             )}
           </div>
         </nav>
       </aside>
-
-      <style jsx>{`
-        .sidebar-overlay {
-          position: fixed;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0,0,0,0.5);
-          z-index: 90;
-        }
-        .sidebar {
-          position: fixed;
-          top: 0; left: -320px;
-          width: 320px;
-          height: 100vh;
-          background: var(--card);
-          box-shadow: var(--shadow-md);
-          z-index: 100;
-          transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          display: flex;
-          flex-direction: column;
-        }
-        .sidebar.open {
-          left: 0;
-        }
-        .sidebar-header {
-          padding: 2rem 1.5rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 1px solid var(--border);
-        }
-        .sidebar-header h2 {
-          margin: 0;
-          font-size: 1.25rem;
-          letter-spacing: 2px;
-        }
-        .btn-close {
-          color: var(--foreground);
-        }
-        .sidebar-nav {
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          flex: 1;
-        }
-        .sidebar-nav a {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          padding: 0.75rem 1rem;
-          border-radius: var(--radius-md);
-          transition: all 0.2s;
-          color: var(--foreground);
-        }
-        .sidebar-nav a:hover {
-          color: var(--primary);
-          background: var(--muted);
-        }
-        .user-info {
-          font-size: 0.875rem;
-          color: var(--muted-foreground);
-        }
-      `}</style>
     </>
   );
 }
