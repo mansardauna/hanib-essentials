@@ -67,7 +67,7 @@ function ShopContent() {
         style={{ backgroundImage: "linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('/images/store_bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="relative z-10 text-center space-y-6">
-          <h1 className="text-4xl md:text-7xl font-bold uppercase tracking-widest drop-shadow-lg">Hanibessentials</h1>
+          <h1 className="text-4xl md:text-7xl font-bold uppercase tracking-widest drop-shadow-lg">Hanib essentials</h1>
           <p className="text-lg md:text-2xl text-white/90 font-medium max-w-2xl mx-auto leading-relaxed drop-shadow-md">
             We sell Stationery, back-to-school items, and Household essentials.
           </p>
