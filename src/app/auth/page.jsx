@@ -45,7 +45,7 @@ export default function AuthPage() {
       <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-brand-100">
         
         <div className="flex justify-center mb-8">
-          <Image src="/images/logo.png" alt="Hanib Logo" width={140} height={50} className="object-cover rounded-full" />
+          <Image src="/images/logo.png" alt="Hanib Logo" width={80} height={80} className="object-cover rounded-full shadow-sm border border-brand-50" />
         </div>
 
         <h2 className="text-2xl font-semibold text-center text-slate-800 mb-8 uppercase tracking-widest">
