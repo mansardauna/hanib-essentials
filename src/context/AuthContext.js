@@ -55,6 +55,7 @@ export function AuthProvider({ children }) {
         email,
         password,
         options: {
+          emailRedirectTo: 'https://hanib-essentials.vercel.app/',
           data: {
             username,
             role,
