@@ -34,7 +34,7 @@
 
 @layer components {
   .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-11/12 max-w-none mx-auto px-4 sm:px-6 lg:px-8;
   }
   .card {
     @apply rounded-2xl shadow-sm border;

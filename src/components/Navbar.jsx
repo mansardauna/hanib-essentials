@@ -53,15 +53,17 @@ export default function Navbar() {
   return (
     <>
       <header className="h-20 flex items-center bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-brand-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <div className="flex items-center gap-4 md:hidden">
             <button onClick={() => setIsSidebarOpen(true)} className="text-slate-700 hover:text-brand-500 transition-colors">
               <Menu size={24} />
             </button>
             <Link href="/" className="flex-shrink-0">
-              <Image src="/images/logo.png" alt="Hanib Logo" width={60} height={60} className="object-cover rounded-full" />
+              <Image src="/images/logo.png" alt="Hanib Logo" width={40} height={40} className="object-cover rounded-full" />
             </Link>
           </div>
+          
+          <div className="hidden md:block w-8"></div> {/* Spacer for desktop so search isn't tight left */}
           
           <form className="hidden md:flex justify-center px-4 flex-1 max-w-lg relative" onSubmit={handleSearch}>
             <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 py-2 w-full shadow-sm focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-200 transition-all">

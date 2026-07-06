@@ -60,7 +60,7 @@ function ShopContent() {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 font-sans">
+    <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 font-sans">
       {/* Banner Section */}
       <section 
         className="text-white rounded-3xl p-8 md:p-24 relative overflow-hidden flex items-center justify-center min-h-[500px] mb-12 shadow-lg"
@@ -190,7 +190,7 @@ function ProductCard({ product, addToCart, user }) {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto p-16 text-center text-brand-500 animate-pulse font-medium text-xl">Loading amazing products...</div>}>
+    <Suspense fallback={<div className="w-full mx-auto p-16 text-center text-brand-500 animate-pulse font-medium text-xl">Loading amazing products...</div>}>
       <ShopContent />
     </Suspense>
   );

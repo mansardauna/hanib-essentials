@@ -25,16 +25,30 @@ export const viewport = {
 };
 
 import { Suspense } from 'react';
+import Sidebar from '@/components/Sidebar';
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${poppins.variable}`}>
-      <body>
+      <body className="bg-slate-50">
         <AuthProvider>
-          <Suspense fallback={<div>Loading nav...</div>}>
-            <Navbar />
-          </Suspense>
-          {children}
+          <div className="flex min-h-screen">
+            {/* The Sidebar component manages its own mobile drawer vs desktop permanent state */}
+            <div className="hidden md:block shrink-0">
+              <Sidebar />
+            </div>
+            
+            <div className="flex-1 flex flex-col min-w-0">
+              <Suspense fallback={<div className="h-20 bg-white"></div>}>
+                <Navbar />
+              </Suspense>
+              
+              {/* Added a bottom padding to account for mobile navigation bar */}
+              <div className="flex-1 w-11/12 mx-auto max-w-none pb-24 md:pb-8">
+                {children}
+              </div>
+            </div>
+          </div>
         </AuthProvider>
       </body>
     </html>
