@@ -104,7 +104,7 @@ export default function TrackOrder() {
               <div className="order-footer">
                 <div>
                   <span className="total">Total: ₦{order.total.toLocaleString()}</span>
-                  {order.location === 'Outside Kaduna' && (
+                  {order.location === 'Outside Kaduna / Other' && (
                     <p style={{fontSize: '0.8rem', color: 'var(--muted-foreground)', margin: '4px 0 0 0'}}>
                       Delivery to {order.location} (Fee: ₦{order.deliveryFee.toLocaleString()})
                     </p>

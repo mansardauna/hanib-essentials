@@ -67,7 +67,7 @@ export default function ManageOrders() {
                 <td>{order.id}</td>
                 <td>{new Date(order.date).toLocaleDateString()}</td>
                 <td>
-                  {order.location === 'Outside Kaduna' ? (
+                  {order.location === 'Outside Kaduna / Other' ? (
                     <span className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold">Outside Kaduna</span>
                   ) : (
                     <span className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-xs font-bold">{order.location || 'Within Kaduna'}</span>

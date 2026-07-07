@@ -5,13 +5,73 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
+const DELIVERY_ZONES = [
+  // N1000
+  { name: 'Babbar Saura', fee: 1000 },
+  { name: 'Millennium City', fee: 1000 },
+  { name: 'Keke', fee: 1000 },
+  // N1500
+  { name: 'Park Delivery (Inter-state)', fee: 1500 },
+  { name: 'Badarawa', fee: 1500 },
+  { name: 'Kawo', fee: 1500 },
+  { name: 'Malali', fee: 1500 },
+  { name: 'Ungwan Dosa', fee: 1500 },
+  { name: 'Ungwan Rimi', fee: 1500 },
+  { name: 'Ungwan Sarki', fee: 1500 },
+  { name: 'Badiko', fee: 1500 },
+  { name: 'Karji', fee: 1500 },
+  { name: 'Kamazou', fee: 1500 },
+  { name: 'Central Market', fee: 1500 },
+  { name: 'Cikin Gari', fee: 1500 },
+  { name: 'Gwamna Road', fee: 1500 },
+  { name: 'Tudun Nupawa', fee: 1500 },
+  { name: 'Tudun Wada', fee: 1500 },
+  { name: 'Hayin Dan Mani', fee: 1500 },
+  { name: 'Hayin Malam Bello', fee: 1500 },
+  { name: 'Hayin Banki', fee: 1500 },
+  { name: 'Kurmin Mashi', fee: 1500 },
+  { name: 'Ungwan Kanawa', fee: 1500 },
+  { name: 'Ungwan Shanu', fee: 1500 },
+  { name: 'NASFAT', fee: 1500 },
+  { name: 'Kadaure', fee: 1500 },
+  { name: 'Malalin Gabas', fee: 1500 },
+  { name: 'Rafin Guza', fee: 1500 },
+  { name: 'Magajin Gari', fee: 1500 },
+  { name: 'Constitution', fee: 1500 },
+  { name: 'Shooting Range', fee: 1500 },
+  // N2000
+  { name: 'Agwa', fee: 2000 },
+  { name: 'Hayin Na\'iya', fee: 2000 },
+  { name: 'Agric Quarters', fee: 2000 },
+  { name: 'Mando', fee: 2000 },
+  { name: 'NDC', fee: 2000 },
+  { name: 'Jan Ruwa', fee: 2000 },
+  { name: 'Mai Gero', fee: 2000 },
+  { name: 'Kudenda', fee: 2000 },
+  { name: 'Mahuta', fee: 2000 },
+  { name: 'Narayi', fee: 2000 },
+  { name: 'Nariya', fee: 2000 },
+  { name: 'Samrada Junction', fee: 2000 },
+  { name: 'Television Garage', fee: 2000 },
+  { name: 'Refinery Junction', fee: 2000 },
+  { name: 'Romi', fee: 2000 },
+  { name: 'Sabon Tasha', fee: 2000 },
+  { name: 'Train Station', fee: 2000 },
+  { name: 'Trikania', fee: 2000 },
+  { name: 'Gonin Gora', fee: 2000 },
+  { name: 'Mararban Jos', fee: 2000 },
+  { name: 'Mararban Rido', fee: 2000 },
+].sort((a, b) => a.name.localeCompare(b.name));
+
+const OUTSIDE_KADUNA = 'Outside Kaduna / Other';
+
 export default function CheckoutPage() {
   const { user, updateProfile, loading } = useAuth();
   const router = useRouter();
   
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
-  const [location, setLocation] = useState('Within Kaduna'); // 'Within Kaduna' or 'Outside Kaduna'
+  const [location, setLocation] = useState(DELIVERY_ZONES[0].name); 
   const [cart, setCart] = useState([]);
   
   const [showOPayModal, setShowOPayModal] = useState(false);
@@ -35,7 +95,6 @@ export default function CheckoutPage() {
     setShowOPayModal(true);
     setPaymentStatus('processing');
     
-    // Simulate OPay network request
     setTimeout(() => {
       setPaymentStatus('success');
       setTimeout(() => {
@@ -57,10 +116,13 @@ export default function CheckoutPage() {
     }
     
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // If outside Kaduna, delivery fee is 0 initially (pending quote). Otherwise, sum of product delivery fees.
-    const totalDeliveryFee = location === 'Within Kaduna' 
-      ? cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0) 
-      : 0;
+    
+    let totalDeliveryFee = 0;
+    const selectedZone = DELIVERY_ZONES.find(z => z.name === location);
+    if (selectedZone) {
+      totalDeliveryFee = selectedZone.fee;
+    }
+
     const total = subtotal + totalDeliveryFee;
     
     try {
@@ -116,10 +178,15 @@ export default function CheckoutPage() {
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center font-medium text-slate-500">Loading checkout...</div>;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalDeliveryFee = location === 'Within Kaduna' 
-    ? cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0)
-    : 0;
+  
+  let totalDeliveryFee = 0;
+  const selectedZone = DELIVERY_ZONES.find(z => z.name === location);
+  if (selectedZone) {
+    totalDeliveryFee = selectedZone.fee;
+  }
+  
   const grandTotal = subtotal + totalDeliveryFee;
+  const isOutside = location === OUTSIDE_KADUNA;
 
   return (
     <main className="w-11/12 max-w-none mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -138,19 +205,27 @@ export default function CheckoutPage() {
             
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Location</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Area / Zone</label>
                 <select 
                   className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
                 >
-                  <option value="Within Kaduna">Within Kaduna State</option>
-                  <option value="Outside Kaduna">Outside Kaduna State</option>
+                  <optgroup label="Within Kaduna State">
+                    {DELIVERY_ZONES.map(zone => (
+                      <option key={zone.name} value={zone.name}>
+                        {zone.name} (₦{zone.fee.toLocaleString()})
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Other Locations">
+                    <option value={OUTSIDE_KADUNA}>{OUTSIDE_KADUNA}</option>
+                  </optgroup>
                 </select>
                 <p className="text-xs text-slate-500 mt-2">
-                  {location === 'Within Kaduna' 
-                    ? "Standard local delivery rates apply to your order."
-                    : "For orders outside Kaduna, we will calculate your delivery fee based on distance. You can pay after we update your order."}
+                  {!isOutside
+                    ? "Flat-rate delivery fee applied based on your area."
+                    : "For orders outside our standard zones, we will calculate your delivery fee based on distance. You can pay after we update your order."}
                 </p>
               </div>
 
@@ -159,7 +234,7 @@ export default function CheckoutPage() {
                 <input 
                   type="text" 
                   className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
-                  placeholder="E.g., 123 Main Street, City, State" 
+                  placeholder="E.g., 123 Main Street, House No." 
                   value={address}
                   onChange={e => setAddress(e.target.value)}
                   required 
@@ -204,8 +279,8 @@ export default function CheckoutPage() {
                 <span>₦{subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Delivery Fees:</span>
-                {location === 'Within Kaduna' ? (
+                <span>Delivery Fee:</span>
+                {!isOutside ? (
                   <span>₦{totalDeliveryFee.toLocaleString()}</span>
                 ) : (
                   <span className="text-brand-600 italic">Pending Quote</span>
@@ -213,7 +288,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
                 <span className="text-lg font-semibold text-slate-800">Total:</span>
-                {location === 'Within Kaduna' ? (
+                {!isOutside ? (
                   <span className="text-2xl font-bold text-brand-600">₦{grandTotal.toLocaleString()}</span>
                 ) : (
                   <span className="text-xl font-bold text-slate-400">To be decided</span>
@@ -221,7 +296,7 @@ export default function CheckoutPage() {
               </div>
             </div>
             
-            {location === 'Within Kaduna' ? (
+            {!isOutside ? (
               <button 
                 onClick={handleOPayClick} 
                 disabled={cart.length === 0}
