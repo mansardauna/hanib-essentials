@@ -92,15 +92,8 @@ export default function CheckoutPage() {
 
   const handleOPayClick = () => {
     if (!address || !phone) return alert('Please provide your Delivery Address and Phone Number.');
+    setPaymentStatus('idle');
     setShowOPayModal(true);
-    setPaymentStatus('processing');
-    
-    setTimeout(() => {
-      setPaymentStatus('success');
-      setTimeout(() => {
-        placeOrder(true);
-      }, 1500);
-    }, 3000);
   };
 
   const handleRequestQuoteClick = async () => {

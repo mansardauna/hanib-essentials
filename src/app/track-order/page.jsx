@@ -45,23 +45,8 @@ export default function TrackOrder() {
 
   const handlePayNow = (order) => {
     setOrderToPay(order);
+    setPaymentStatus('idle');
     setShowOPayModal(true);
-    setPaymentStatus('processing');
-    
-    // Simulate OPay payment
-    setTimeout(() => {
-      setPaymentStatus('success');
-      setTimeout(async () => {
-        // Update order to Processing
-        const { data, error } = await supabase.from('orders').update({ status: 'Processing' }).eq('id', order.id).select();
-        if (!error && data) {
-          setOrders(prev => prev.map(o => o.id === order.id ? data[0] : o));
-        }
-        setShowOPayModal(false);
-        setOrderToPay(null);
-        setPaymentStatus('idle');
-      }, 1500);
-    }, 3000);
   };
 
   if (loading || !user) return <div className="container" style={{padding: '4rem 1rem'}}>Loading...</div>;
