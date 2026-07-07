@@ -30,7 +30,6 @@ export default function CartModal({ isOpen, onClose, cart, setCart }) {
   };
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalDelivery = cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0);
 
   return (
     <div className="modal-overlay">
@@ -51,7 +50,6 @@ export default function CartModal({ isOpen, onClose, cart, setCart }) {
                     <th>Item</th>
                     <th>Price</th>
                     <th>Quantity</th>
-                    <th>Delivery</th>
                     <th>Subtotal</th>
                     <th></th>
                   </tr>
@@ -68,7 +66,6 @@ export default function CartModal({ isOpen, onClose, cart, setCart }) {
                           <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="qty-btn"><Plus size={14}/></button>
                         </div>
                       </td>
-                      <td>₦{(item.deliveryFee * item.quantity).toLocaleString()}</td>
                       <td className="item-subtotal">₦{(item.price * item.quantity).toLocaleString()}</td>
                       <td>
                         <button onClick={() => removeFromCart(item.id)} className="btn-icon">
@@ -86,9 +83,8 @@ export default function CartModal({ isOpen, onClose, cart, setCart }) {
         {cart.length > 0 && (
           <div className="modal-footer">
             <div className="totals">
-              <p>Items Subtotal: <span>₦{total.toLocaleString()}</span></p>
-              <p>Delivery Fees: <span>₦{totalDelivery.toLocaleString()}</span></p>
-              <h3>Grand Total: <span>₦{(total + totalDelivery).toLocaleString()}</span></h3>
+              <h3>Grand Total: <span>₦{total.toLocaleString()}</span></h3>
+              <p style={{fontSize: '0.8rem', marginTop: '0.25rem'}}>Delivery fee calculated at checkout</p>
             </div>
             <button onClick={proceedToCheckout} className="btn btn-primary w-full">Proceed to Checkout</button>
           </div>

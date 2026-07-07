@@ -160,9 +160,6 @@ export default function ProductDetail() {
           
           <div className="flex items-end gap-4 py-6 border-y border-slate-100">
             <span className="text-4xl font-black text-slate-900">₦{product.price.toLocaleString()}</span>
-            <span className="text-sm font-bold text-slate-500 mb-1">
-              + ₦{product.deliveryFee.toLocaleString()} Delivery
-            </span>
           </div>
           
           <div className="space-y-4">
