@@ -141,6 +141,8 @@ export default function CheckoutPage() {
 
       if (!error && data) {
         localStorage.removeItem('hanib_cart_v2');
+        setCart([]);
+        window.dispatchEvent(new Event('storage'));
         
         try {
           await fetch('/api/send-email', {
@@ -302,7 +304,7 @@ export default function CheckoutPage() {
                 disabled={cart.length === 0}
                 className="w-full mt-8 py-4 bg-[#17B169] hover:bg-[#128e54] text-white font-bold rounded-2xl shadow-sm transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Pay with OPay
+                Transfer via OPay
               </button>
             ) : (
               <button 
