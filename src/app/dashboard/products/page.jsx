@@ -145,6 +145,21 @@ export default function ProductsManagement() {
     setProductForm({ ...productForm, image: imgs.join(',') });
   };
 
+  const deleteProduct = async (product) => {
+    if (confirm(`Are you sure you want to delete the product "${product.name}"?`)) {
+      try {
+        const { error } = await supabase.from('products').delete().eq('id', product.id);
+        if (!error) {
+          setProducts(prev => prev.filter(p => p.id !== product.id));
+        } else {
+          alert('Failed to delete product');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
   /* --- Category Functions --- */
   const openAddCategoryModal = () => {
     setCategoryModalMode('add');
@@ -289,9 +304,12 @@ export default function ProductsManagement() {
                           <span className="text-red-700 bg-red-100 px-3 py-1 rounded-md text-xs font-bold">0</span>
                         )}
                       </td>
-                      <td className="p-4">
+                      <td className="p-4 flex gap-2">
                         <button onClick={() => openEditProductModal(product)} className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-600 hover:bg-brand-100 font-bold rounded-lg transition-colors text-sm">
                           <Edit2 size={16} /> Edit
+                        </button>
+                        <button onClick={() => deleteProduct(product)} className="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors text-sm">
+                          <Trash2 size={16} /> Delete
                         </button>
                       </td>
                     </tr>
