@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Truck, CheckCircle, Clock } from 'lucide-react';
+import { Truck, CheckCircle, Clock, DollarSign } from 'lucide-react';
 
 export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
@@ -16,25 +16,33 @@ export default function ManageOrders() {
       const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select();
       if (!error && data) {
         setOrders(prev => prev.map(o => o.id === id ? data[0] : o));
-        
-        // Send status update email
-        try {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: 'customer@hanib.demo', // Replace with dynamic customer email if available
-              subject: `Order Update - ${id}`,
-              html: `<h1>Order Status Update</h1>
-                     <p>Your order <strong>${id}</strong> has been updated to: <strong>${status}</strong></p>`
-            })
-          });
-        } catch (e) {
-          console.error('Email sending failed', e);
-        }
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleSetQuote = async (order) => {
+    const quote = prompt(`Enter the delivery fee for this order to ${order.location || 'Outside Kaduna'} (₦):`);
+    if (quote === null || quote === '') return;
+    const fee = parseInt(quote);
+    if (isNaN(fee)) return alert('Invalid amount');
+
+    const newTotal = order.subtotal + fee;
+
+    try {
+      const { data, error } = await supabase.from('orders')
+        .update({ deliveryFee: fee, total: newTotal, status: 'Pending Payment' })
+        .eq('id', order.id)
+        .select();
+
+      if (!error && data) {
+        setOrders(prev => prev.map(o => o.id === order.id ? data[0] : o));
+        alert('Delivery quote sent successfully! The customer can now pay for the order.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to set quote');
     }
   };
 
@@ -46,8 +54,8 @@ export default function ManageOrders() {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Customer</th>
               <th>Date</th>
+              <th>Location</th>
               <th>Total</th>
               <th>Status</th>
               <th>Action</th>
@@ -57,16 +65,36 @@ export default function ManageOrders() {
             {orders.map(order => (
               <tr key={order.id}>
                 <td>{order.id}</td>
-                <td>{order.userId}</td>
                 <td>{new Date(order.date).toLocaleDateString()}</td>
-                <td>₦{order.total.toLocaleString()}</td>
                 <td>
-                  <span className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</span>
+                  {order.location === 'Outside Kaduna' ? (
+                    <span className="bg-red-50 text-red-600 px-2 py-1 rounded text-xs font-bold">Outside Kaduna</span>
+                  ) : (
+                    <span className="bg-emerald-50 text-emerald-600 px-2 py-1 rounded text-xs font-bold">{order.location || 'Within Kaduna'}</span>
+                  )}
                 </td>
                 <td>
+                  {order.status === 'Awaiting Quote' ? (
+                    <span className="text-slate-400 italic font-medium">Pending Quote</span>
+                  ) : (
+                    `₦${order.total.toLocaleString()}`
+                  )}
+                </td>
+                <td>
+                  <span className={`status-badge ${order.status.replace(' ', '-').toLowerCase()}`}>{order.status}</span>
+                </td>
+                <td>
+                  {order.status === 'Awaiting Quote' && (
+                    <button onClick={() => handleSetQuote(order)} className="btn btn-primary btn-sm flex items-center gap-1">
+                      <DollarSign size={14} /> Set Quote
+                    </button>
+                  )}
+                  {order.status === 'Pending Payment' && (
+                    <span style={{color: 'var(--muted-foreground)', fontSize: '0.875rem'}}>Waiting for payment...</span>
+                  )}
                   {order.status === 'Processing' && (
-                    <button onClick={() => updateStatus(order.id, 'Delivered')} className="btn btn-primary btn-sm">
-                      <Truck size={14} style={{marginRight: '0.25rem'}}/> Mark Delivered
+                    <button onClick={() => updateStatus(order.id, 'Delivered')} className="btn btn-primary btn-sm flex items-center gap-1">
+                      <Truck size={14} /> Mark Delivered
                     </button>
                   )}
                   {order.status === 'Delivered' && (
@@ -85,32 +113,16 @@ export default function ManageOrders() {
       </div>
 
       <style jsx>{`
-        .table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .table th, .table td {
-          padding: 1rem;
-          text-align: left;
-          border-bottom: 1px solid var(--border);
-        }
-        .table th {
-          color: var(--muted-foreground);
-          font-weight: 500;
-        }
-        .status-badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: var(--radius-full);
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .table th { color: var(--muted-foreground); font-weight: 500; }
+        .status-badge { padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; }
         .status-badge.processing { background: #fef3c7; color: #d97706; }
         .status-badge.delivered { background: #dbeafe; color: #2563eb; }
         .status-badge.received { background: #d1fae5; color: #059669; }
-        .btn-sm {
-          padding: 0.25rem 0.5rem;
-          font-size: 0.75rem;
-        }
+        .status-badge.awaiting-quote { background: #fce7f3; color: #be185d; }
+        .status-badge.pending-payment { background: #e0e7ff; color: #4338ca; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
       `}</style>
     </div>
   );

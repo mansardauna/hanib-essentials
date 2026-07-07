@@ -11,10 +11,12 @@ export default function CheckoutPage() {
   
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('Within Kaduna'); // 'Within Kaduna' or 'Outside Kaduna'
   const [cart, setCart] = useState([]);
   
   const [showOPayModal, setShowOPayModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, processing, success
+  const [isPlacingQuoteOrder, setIsPlacingQuoteOrder] = useState(false);
   
   useEffect(() => {
     if (!loading && !user) {
@@ -37,18 +39,28 @@ export default function CheckoutPage() {
     setTimeout(() => {
       setPaymentStatus('success');
       setTimeout(() => {
-        placeOrder();
+        placeOrder(true);
       }, 1500);
     }, 3000);
   };
 
-  const placeOrder = async () => {
+  const handleRequestQuoteClick = async () => {
+    if (!address || !phone) return alert('Please provide your Delivery Address and Phone Number.');
+    setIsPlacingQuoteOrder(true);
+    await placeOrder(false);
+    setIsPlacingQuoteOrder(false);
+  };
+
+  const placeOrder = async (isPaid) => {
     if (!user.address || !user.phone) {
       await updateProfile(address, phone);
     }
     
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const totalDeliveryFee = cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0);
+    // If outside Kaduna, delivery fee is 0 initially (pending quote). Otherwise, sum of product delivery fees.
+    const totalDeliveryFee = location === 'Within Kaduna' 
+      ? cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0) 
+      : 0;
     const total = subtotal + totalDeliveryFee;
     
     try {
@@ -59,7 +71,8 @@ export default function CheckoutPage() {
         subtotal,
         deliveryFee: totalDeliveryFee,
         total,
-        status: "Processing"
+        location,
+        status: isPaid ? "Processing" : "Awaiting Quote"
       };
 
       const { data, error } = await supabase.from('orders').insert([newOrder]).select();
@@ -75,9 +88,12 @@ export default function CheckoutPage() {
               to: user.email,
               subject: `Order Confirmation - ${newOrder.id}`,
               html: `<h1>Thank you for your order!</h1>
-                     <p>Your order <strong>${newOrder.id}</strong> has been received and is currently processing.</p>
-                     <p>Total: ₦${total.toLocaleString()}</p>
-                     <p><a href="https://hanib-essentials.vercel.app/receipt/${newOrder.id}">View your receipt and QR Code</a></p>`
+                     <p>Your order <strong>${newOrder.id}</strong> has been received.</p>
+                     ${isPaid 
+                       ? `<p>It is currently processing. Total paid: ₦${total.toLocaleString()}</p>` 
+                       : `<p>We will calculate your delivery fee based on your location outside Kaduna and update the order shortly. You can then complete the payment.</p>`
+                     }
+                     <p><a href="https://hanib-essentials.vercel.app/receipt/${newOrder.id}">View your receipt</a></p>`
             })
           });
         } catch (e) {
@@ -100,11 +116,13 @@ export default function CheckoutPage() {
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center font-medium text-slate-500">Loading checkout...</div>;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const totalDeliveryFee = cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0);
+  const totalDeliveryFee = location === 'Within Kaduna' 
+    ? cart.reduce((sum, item) => sum + ((item.deliveryFee || 0) * item.quantity), 0)
+    : 0;
   const grandTotal = subtotal + totalDeliveryFee;
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-12">
+    <main className="w-11/12 max-w-none mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Shipping Form */}
@@ -120,11 +138,28 @@ export default function CheckoutPage() {
             
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Address</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Location</label>
+                <select 
+                  className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                >
+                  <option value="Within Kaduna">Within Kaduna State</option>
+                  <option value="Outside Kaduna">Outside Kaduna State</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-2">
+                  {location === 'Within Kaduna' 
+                    ? "Standard local delivery rates apply to your order."
+                    : "For orders outside Kaduna, we will calculate your delivery fee based on distance. You can pay after we update your order."}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Delivery Address</label>
                 <input 
                   type="text" 
                   className="w-full bg-slate-50 border border-slate-200 px-5 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all font-medium text-slate-800"
-                  placeholder="E.g., 123 Main Street, City" 
+                  placeholder="E.g., 123 Main Street, City, State" 
                   value={address}
                   onChange={e => setAddress(e.target.value)}
                   required 
@@ -170,21 +205,39 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between">
                 <span>Delivery Fees:</span>
-                <span>₦{totalDeliveryFee.toLocaleString()}</span>
+                {location === 'Within Kaduna' ? (
+                  <span>₦{totalDeliveryFee.toLocaleString()}</span>
+                ) : (
+                  <span className="text-brand-600 italic">Pending Quote</span>
+                )}
               </div>
               <div className="flex justify-between items-center pt-4 border-t border-slate-100 mt-4">
                 <span className="text-lg font-semibold text-slate-800">Total:</span>
-                <span className="text-2xl font-bold text-brand-600">₦{grandTotal.toLocaleString()}</span>
+                {location === 'Within Kaduna' ? (
+                  <span className="text-2xl font-bold text-brand-600">₦{grandTotal.toLocaleString()}</span>
+                ) : (
+                  <span className="text-xl font-bold text-slate-400">To be decided</span>
+                )}
               </div>
             </div>
             
-            <button 
-              onClick={handleOPayClick} 
-              disabled={cart.length === 0}
-              className="w-full mt-8 py-4 bg-[#17B169] hover:bg-[#128e54] text-white font-bold rounded-2xl shadow-sm transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Pay with OPay
-            </button>
+            {location === 'Within Kaduna' ? (
+              <button 
+                onClick={handleOPayClick} 
+                disabled={cart.length === 0}
+                className="w-full mt-8 py-4 bg-[#17B169] hover:bg-[#128e54] text-white font-bold rounded-2xl shadow-sm transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Pay with OPay
+              </button>
+            ) : (
+              <button 
+                onClick={handleRequestQuoteClick} 
+                disabled={cart.length === 0 || isPlacingQuoteOrder}
+                className="w-full mt-8 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-2xl shadow-sm transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPlacingQuoteOrder ? 'Placing Order...' : 'Request Delivery Quote'}
+              </button>
+            )}
           </div>
         </div>
       </div>
