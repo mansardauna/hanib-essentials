@@ -406,10 +406,7 @@ export default function ProductsManagement() {
                   <input required type="number" min="0" className="w-full bg-white border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand-400 font-medium text-slate-800" value={productForm.stock} onChange={e => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})} />
                 </div>
                 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Delivery Fee (Within Kaduna, ₦)</label>
-                  <input required type="number" min="0" className="w-full bg-white border border-slate-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand-400 font-medium text-slate-800" value={productForm.deliveryFee} onChange={e => setProductForm({...productForm, deliveryFee: parseInt(e.target.value) || 0})} />
-                </div>
+
               </div>
               
               <div>

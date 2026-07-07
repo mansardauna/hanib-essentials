@@ -320,21 +320,53 @@ export default function CheckoutPage() {
       {/* OPay Modal */}
       {showOPayModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl transform transition-all">
-            <h2 className="text-[#17B169] text-4xl font-black tracking-tighter mb-8">OPay</h2>
+          <div className="bg-white w-full max-w-md rounded-3xl p-8 text-center shadow-2xl transform transition-all">
+            <h2 className="text-[#17B169] text-3xl font-black tracking-tighter mb-4">Transfer with OPay</h2>
             
-            {paymentStatus === 'processing' ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-slate-100 border-t-[#17B169] rounded-full animate-spin"></div>
-                <p className="font-semibold text-slate-700">Processing Payment securely...</p>
-                <span className="text-3xl font-bold text-slate-800 mt-2">₦{grandTotal.toLocaleString()}</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-16 h-16 bg-[#17B169] text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-md">
-                  ✓
+            {paymentStatus === 'idle' && (
+              <div className="text-left bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-6 space-y-4">
+                <p className="text-sm font-medium text-slate-600 text-center">Please transfer exactly <strong className="text-lg text-brand-600">₦{grandTotal.toLocaleString()}</strong> to the account below:</p>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span className="text-xs font-bold text-slate-400 uppercase">Bank</span>
+                    <span className="font-bold text-slate-800">OPAY</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                    <span className="text-xs font-bold text-slate-400 uppercase">Account Name</span>
+                    <span className="font-bold text-slate-800">HALIMAT Muhammad</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-xs font-bold text-slate-400 uppercase">Account Number</span>
+                    <span className="font-bold text-xl text-[#17B169] tracking-wider">8033101543</span>
+                  </div>
                 </div>
-                <p className="text-xl font-bold text-slate-800 mt-2">Payment Successful!</p>
+                <button 
+                  onClick={() => {
+                    setPaymentStatus('processing');
+                    setTimeout(() => {
+                      setPaymentStatus('success');
+                      setTimeout(() => placeOrder(true), 1500);
+                    }, 2000);
+                  }}
+                  className="w-full py-4 bg-[#17B169] hover:bg-[#128e54] text-white font-bold rounded-xl shadow-md transition-colors"
+                >
+                  I have made the transfer
+                </button>
+                <button onClick={() => setShowOPayModal(false)} className="w-full py-2 text-slate-500 font-semibold hover:text-slate-800 transition-colors">Cancel</button>
+              </div>
+            )}
+
+            {paymentStatus === 'processing' && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <div className="w-12 h-12 border-4 border-slate-100 border-t-[#17B169] rounded-full animate-spin"></div>
+                <p className="font-semibold text-slate-700">Confirming transfer...</p>
+              </div>
+            )}
+
+            {paymentStatus === 'success' && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <div className="w-16 h-16 bg-[#17B169] text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-md">✓</div>
+                <p className="text-xl font-bold text-slate-800 mt-2">Order Confirmed!</p>
                 <span className="text-sm font-medium text-slate-500">Redirecting to your orders...</span>
               </div>
             )}
