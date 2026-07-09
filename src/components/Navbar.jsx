@@ -58,8 +58,9 @@ export default function Navbar() {
             <button onClick={() => setIsSidebarOpen(true)} className="text-slate-700 hover:text-brand-500 transition-colors">
               <Menu size={24} />
             </button>
-            <Link href="/" className="flex-shrink-0">
-              <Image src="/images/logo.png" alt="Hanib Logo" width={40} height={40} className="object-cover rounded-full" />
+            <Link href="/" className="flex flex-shrink-0 items-center gap-2">
+              <Image src="/images/logo.png" alt="Hanib Logo" width={32} height={32} className="object-cover rounded-full" />
+              <span className="font-bold text-slate-800 text-lg whitespace-nowrap md:hidden">Hanib Essentials</span>
             </Link>
           </div>
           

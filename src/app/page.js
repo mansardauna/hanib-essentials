@@ -115,7 +115,7 @@ function ShopContent() {
         <>
           <div className="space-y-6">
             <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">Trending Now</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex overflow-x-auto pb-4 gap-6 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-8 scrollbar-hide">
               {displayedProducts.slice(0, 4).map(product => (
                 <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
               ))}
@@ -125,7 +125,7 @@ function ShopContent() {
           {displayedProducts.length > 4 && (
             <div className="space-y-6 pt-12">
               <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">Discover More Items</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="flex overflow-x-auto pb-4 gap-6 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-8 scrollbar-hide">
                 {displayedProducts.slice(4).map(product => (
                   <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
                 ))}
@@ -136,9 +136,9 @@ function ShopContent() {
       ) : (
         <div className="space-y-6">
           <h2 className="text-3xl font-semibold text-transparent bg-clip-text bg-gradient-brand inline-block mb-4">{search ? `Search Results for "${search}"` : filter}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex overflow-x-auto pb-4 gap-6 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-8 scrollbar-hide">
             {displayedProducts.length === 0 ? (
-              <p className="text-slate-500 italic col-span-full text-center py-12 bg-white/50 rounded-3xl font-medium">No products found.</p>
+              <p className="text-slate-500 italic w-full text-center py-12 bg-white/50 rounded-3xl font-medium sm:col-span-full">No products found.</p>
             ) : (
               displayedProducts.map(product => (
                 <ProductCard key={product.id} product={product} addToCart={addToCart} user={user} />
@@ -157,7 +157,7 @@ function ProductCard({ product, addToCart, user }) {
   const primaryImage = imageUrls.length > 0 ? imageUrls[0] : null;
 
   return (
-    <Link href={`/product/${product.id}`} className="group flex flex-col bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-brand-50 hover:border-brand-peach transform hover:-translate-y-2">
+    <Link href={`/product/${product.id}`} className="group flex flex-col min-w-[280px] shrink-0 sm:min-w-0 sm:shrink snap-start bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-brand-50 hover:border-brand-peach transform hover:-translate-y-2">
       <div className="relative h-64 flex items-center justify-center p-6 border-b border-slate-50 bg-slate-50 overflow-hidden">
         {primaryImage ? (
           <Image src={primaryImage} alt={product.name} fill className="object-contain p-6 group-hover:scale-110 transition-transform duration-700 ease-out" />
@@ -176,9 +176,6 @@ function ProductCard({ product, addToCart, user }) {
         
         <div className="mt-auto pt-4 flex flex-col gap-1">
           <span className="text-2xl font-black text-slate-900">₦{product.price.toLocaleString()}</span>
-          <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 self-start px-2 py-0.5 rounded-md mt-1">
-            {product.deliveryFee === 0 ? '🎉 Free Delivery' : `🚚 +₦${product.deliveryFee} Delivery`}
-          </span>
         </div>
         
         <div className="text-xs font-medium mt-1 mb-4">
