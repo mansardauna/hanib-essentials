@@ -58,7 +58,18 @@ function ShopContent() {
     window.dispatchEvent(new Event('storage'));
   };
 
-  const categories = ['All', 'Special Offers', 'School Items', 'Toys'];
+  const [categories, setCategories] = useState(['All', 'Special Offers']);
+
+  useEffect(() => {
+    supabase.from('categories').select('name')
+      .then(({ data, error }) => {
+        if (!error && data) {
+          const fetchedCats = data.map(c => c.name);
+          setCategories(['All', 'Special Offers', ...fetchedCats]);
+        }
+      })
+      .catch(console.error);
+  }, []);
   
   let displayedProducts = products.filter(p => {
     const matchesFilter = filter === 'All' ? true : (filter === 'Special Offers' ? p.specialOffer : p.category === filter);
