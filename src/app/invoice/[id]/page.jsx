@@ -77,7 +77,6 @@ export default function InvoicePage() {
               <th>Description</th>
               <th style={{textAlign: 'center'}}>Qty</th>
               <th style={{textAlign: 'right'}}>Unit Price</th>
-              <th style={{textAlign: 'right'}}>Delivery</th>
               <th style={{textAlign: 'right'}}>Total</th>
             </tr>
           </thead>
@@ -90,8 +89,7 @@ export default function InvoicePage() {
                 </td>
                 <td style={{textAlign: 'center'}}>{item.quantity}</td>
                 <td style={{textAlign: 'right'}}>₦{item.price.toLocaleString()}</td>
-                <td style={{textAlign: 'right'}}>₦{item.deliveryFee.toLocaleString()}</td>
-                <td style={{textAlign: 'right'}}>₦{((item.price * item.quantity) + item.deliveryFee).toLocaleString()}</td>
+                <td style={{textAlign: 'right'}}>₦{(item.price * item.quantity).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
@@ -100,11 +98,11 @@ export default function InvoicePage() {
         <div className="invoice-summary">
           <div className="summary-row">
             <span>Subtotal:</span>
-            <span>₦{order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}</span>
+            <span>₦{(order.subtotal || order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)).toLocaleString()}</span>
           </div>
           <div className="summary-row">
-            <span>Total Delivery Fees:</span>
-            <span>₦{order.items.reduce((sum, item) => sum + item.deliveryFee, 0).toLocaleString()}</span>
+            <span>Delivery Fee:</span>
+            <span>₦{(order.deliveryFee || 0).toLocaleString()}</span>
           </div>
           <div className="summary-row total-row">
             <span>Grand Total:</span>

@@ -93,11 +93,11 @@ export default function ReceiptPage() {
         <div className="receipt-summary">
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>₦{order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}</span>
+            <span>₦{(order.subtotal || order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)).toLocaleString()}</span>
           </div>
           <div className="summary-row">
             <span>Delivery Fees</span>
-            <span>₦{order.items.reduce((sum, item) => sum + item.deliveryFee, 0).toLocaleString()}</span>
+            <span>₦{(order.deliveryFee || 0).toLocaleString()}</span>
           </div>
           <div className="summary-row total-row">
             <span>Total Paid</span>
