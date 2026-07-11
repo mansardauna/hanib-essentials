@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export default function Finances() {
   const [expenses, setExpenses] = useState([]);
@@ -9,27 +10,36 @@ export default function Finances() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/expenses').then(r => r.json()).then(setExpenses).catch(console.error);
+    supabase.from('expenses').select('*').order('date', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) setExpenses(data);
+      })
+      .catch(console.error);
   }, []);
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: form.description,
-          amount: parseFloat(form.amount)
-        })
-      });
-      const newExpense = await res.json();
-      setExpenses([newExpense, ...expenses]);
+      const newExpense = {
+        id: `exp${Date.now()}`,
+        description: form.description,
+        amount: parseFloat(form.amount),
+        date: new Date().toISOString()
+      };
+      
+      const { data, error } = await supabase.from('expenses').insert([newExpense]).select();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setExpenses([data[0], ...expenses]);
+      }
+      
       setShowModal(false);
       setForm({ description: '', amount: '' });
     } catch (error) {
-      alert('Failed to add expense');
+      alert('Failed to add expense. Please make sure you have run the expenses SQL script in Supabase.');
     }
     setLoading(false);
   };
