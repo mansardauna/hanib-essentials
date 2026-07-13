@@ -11,11 +11,21 @@ export default function ManageOrders() {
     supabase.from('orders').select('*').order('date', { ascending: false }).then(({ data }) => { if (data) setOrders(data); });
   }, []);
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (id, status, userId) => {
     try {
       const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select();
       if (!error && data) {
         setOrders(prev => prev.map(o => o.id === id ? data[0] : o));
+        
+        if (userId) {
+          await supabase.from('notifications').insert([{
+            id: `notif_${Date.now()}_u`,
+            userId: userId,
+            title: 'Order Status Updated',
+            message: `Your order ${id} has been updated to: ${status}.`,
+            isRead: false
+          }]);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -38,6 +48,17 @@ export default function ManageOrders() {
 
       if (!error && data) {
         setOrders(prev => prev.map(o => o.id === order.id ? data[0] : o));
+        
+        if (order.userId) {
+          await supabase.from('notifications').insert([{
+            id: `notif_${Date.now()}_q`,
+            userId: order.userId,
+            title: 'Delivery Quote Ready',
+            message: `Your delivery quote for order ${order.id} is ready. Please proceed to payment.`,
+            isRead: false
+          }]);
+        }
+        
         alert('Delivery quote sent successfully! The customer can now pay for the order.');
       }
     } catch (error) {
@@ -93,7 +114,7 @@ export default function ManageOrders() {
                     <span style={{color: 'var(--muted-foreground)', fontSize: '0.875rem'}}>Waiting for payment...</span>
                   )}
                   {order.status === 'Processing' && (
-                    <button onClick={() => updateStatus(order.id, 'Delivered')} className="btn btn-primary btn-sm flex items-center gap-1">
+                    <button onClick={() => updateStatus(order.id, 'Delivered', order.userId)} className="btn btn-primary btn-sm flex items-center gap-1">
                       <Truck size={14} /> Mark Delivered
                     </button>
                   )}

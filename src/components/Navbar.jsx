@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { ShoppingCart, LogOut, Menu, Search, Home, Settings } from 'lucide-react';
+import { ShoppingCart, LogOut, Menu, Search, Home, Settings, Bell } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CartModal from './CartModal';
 import Sidebar from './Sidebar';
@@ -20,6 +20,42 @@ export default function Navbar() {
   const [searchTerm, setSearchTerm] = useState('');
   const [allProducts, setAllProducts] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    // Fetch notifications
+    const fetchNotifications = async () => {
+      let query = supabase.from('notifications').select('*').order('created_at', { ascending: false }).limit(20);
+      
+      if (user.role === 'owner') {
+        query = query.is('userId', null);
+      } else {
+        query = query.eq('userId', user.id);
+      }
+      
+      const { data, error } = await query;
+      if (!error && data) {
+        setNotifications(data);
+      }
+    };
+    
+    fetchNotifications();
+    // In a real production app, we would add a Supabase realtime subscription here
+  }, [user]);
+
+  const markAsRead = async (id) => {
+    try {
+      await supabase.from('notifications').update({ isRead: true }).eq('id', id);
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   useEffect(() => {
     supabase.from('products').select('*')
@@ -108,8 +144,49 @@ export default function Navbar() {
               </div>
             )}
           </form>
-          
           <div className="flex items-center gap-4">
+            {user && (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)} 
+                  className="relative p-2 text-slate-600 hover:text-brand-500 hover:bg-slate-50 rounded-full transition-colors"
+                >
+                  <Bell size={20}/>
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                      <h3 className="font-semibold text-slate-800">Notifications</h3>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-slate-500 text-sm">No notifications yet.</div>
+                      ) : (
+                        notifications.map(n => (
+                          <div 
+                            key={n.id} 
+                            onClick={() => markAsRead(n.id)}
+                            className={`p-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors ${!n.isRead ? 'bg-brand-50/30' : ''}`}
+                          >
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 className={`text-sm ${!n.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>{n.title}</h4>
+                              {!n.isRead && <span className="w-2 h-2 rounded-full bg-brand-500 mt-1"></span>}
+                            </div>
+                            <p className="text-xs text-slate-600">{n.message}</p>
+                            <span className="text-[10px] text-slate-400 mt-2 block">{new Date(n.created_at).toLocaleString()}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             {user?.role === 'owner' ? (
               <Link href="/dashboard" className="hidden md:inline-flex px-5 py-2 border border-brand-200 text-brand-600 rounded-full hover:bg-brand-50 font-medium transition-colors text-sm">Dashboard</Link>
             ) : (

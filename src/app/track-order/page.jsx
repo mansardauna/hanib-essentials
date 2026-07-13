@@ -37,6 +37,14 @@ export default function TrackOrder() {
       const { data, error } = await supabase.from('orders').update({ status: 'Received' }).eq('id', orderId).select();
       if (!error && data) {
         setOrders(prev => prev.map(o => o.id === orderId ? data[0] : o));
+        
+        await supabase.from('notifications').insert([{
+          id: `notif_${Date.now()}_r`,
+          userId: null,
+          title: 'Order Completed',
+          message: `Customer has received order ${orderId}.`,
+          isRead: false
+        }]);
       }
     } catch (error) {
       console.error(error);

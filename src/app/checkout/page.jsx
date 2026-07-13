@@ -138,6 +138,7 @@ export default function CheckoutPage() {
         window.dispatchEvent(new Event('storage'));
         
         try {
+          // Send email to user
           await fetch('/api/send-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -153,8 +154,41 @@ export default function CheckoutPage() {
                      <p><a href="https://hanib-essentials.vercel.app/receipt/${newOrder.id}">View your receipt</a></p>`
             })
           });
+          
+          // Send email to Owner
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: 'Olaomansur@gmail.com',
+              subject: `New Order Received - ${newOrder.id}`,
+              html: `<h1>New Order Alert!</h1>
+                     <p>A new order (<strong>${newOrder.id}</strong>) has been placed by ${user.email}.</p>
+                     <p>Total: ₦${total.toLocaleString()}</p>
+                     <p>Status: ${isPaid ? 'Paid & Processing' : 'Pending Payment (Needs Delivery Quote)'}</p>
+                     <p><a href="https://hanib-essentials.vercel.app/dashboard/orders">View in Dashboard</a></p>`
+            })
+          });
+
+          // Insert Notification for User
+          await supabase.from('notifications').insert([{
+            id: `notif_${Date.now()}_u`,
+            userId: user.id,
+            title: 'Order Placed Successfully',
+            message: `Your order ${newOrder.id} has been received and is being processed.`,
+            isRead: false
+          }]);
+
+          // Insert Notification for Owner
+          await supabase.from('notifications').insert([{
+            id: `notif_${Date.now()}_o`,
+            userId: null, // Null means it's for the owner
+            title: 'New Order Received',
+            message: `Order ${newOrder.id} has been placed.`,
+            isRead: false
+          }]);
         } catch (e) {
-          console.error('Email sending failed', e);
+          console.error('Notifications/Email failed', e);
         }
 
         setShowOPayModal(false);
