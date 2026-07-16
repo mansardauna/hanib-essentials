@@ -19,7 +19,7 @@ function ShopContent() {
   // Banner Slider State
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderImages = [
-    '/images/store_bg.png',
+    '/images/back_to_school_banner.png',
     '/images/banner_stationery.png',
     '/images/banner_toys.png'
   ];
