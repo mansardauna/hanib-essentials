@@ -61,7 +61,7 @@ export default function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[95%] max-w-[360px] bg-white rounded-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] p-4 z-[9999] border border-brand-200 animate-bounce-slight flex items-center gap-3 md:hidden">
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 w-[95%] max-w-[360px] bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 z-[9999] border border-brand-200 animate-bounce-slight flex items-center gap-3 md:hidden">
       <div className="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0">
         <Download size={22} />
       </div>
@@ -84,7 +84,7 @@ export default function InstallPrompt() {
         }
         @keyframes bounce-slight {
           0%, 100% { transform: translate(-50%, 0); }
-          50% { transform: translate(-50%, -5px); }
+          50% { transform: translate(-50%, 5px); }
         }
       `}</style>
     </div>
