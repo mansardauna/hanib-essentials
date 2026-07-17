@@ -61,17 +61,17 @@ export default function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-2xl shadow-2xl p-4 z-[9999] border-2 border-brand-500 animate-bounce-slight flex items-center gap-4">
-      <div className="bg-brand-100 p-3 rounded-full text-brand-600 shrink-0">
-        <Download size={24} />
+    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[95%] max-w-[360px] bg-white rounded-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] p-4 z-[9999] border border-brand-200 animate-bounce-slight flex items-center gap-3 md:hidden">
+      <div className="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0">
+        <Download size={22} />
       </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-slate-800 text-sm">Install Hanib Essentials</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Add to home screen for faster access!</p>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-bold text-slate-800 text-sm truncate">Install App</h3>
+        <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">Add to home screen</p>
       </div>
       <button 
         onClick={handleInstallClick}
-        className="bg-brand-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:bg-brand-600 transition-colors shrink-0"
+        className="bg-brand-500 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-brand-600 transition-colors shrink-0"
       >
         Install
       </button>
