@@ -26,6 +26,7 @@ export const viewport = {
 
 import { Suspense } from 'react';
 import Sidebar from '@/components/Sidebar';
+import InstallPrompt from '@/components/InstallPrompt';
 
 export default function RootLayout({ children }) {
   return (
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
               </div>
             </div>
           </div>
+          <InstallPrompt />
         </AuthProvider>
       </body>
     </html>

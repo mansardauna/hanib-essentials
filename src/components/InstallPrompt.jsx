@@ -1,0 +1,92 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Download, X, Share } from 'lucide-react';
+
+export default function InstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    // Check if user has already dismissed it this session or it's installed
+    const hasDismissed = sessionStorage.getItem('installPromptDismissed');
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    
+    if (isStandalone) return; // Already installed
+    
+    // Check if iOS
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    setIsIOS(isIosDevice);
+
+    if (!hasDismissed) {
+      // Show it after a small delay so it's not jarring
+      setTimeout(() => setShowPrompt(true), 2000);
+    }
+
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowPrompt(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setShowPrompt(false);
+      }
+      setDeferredPrompt(null);
+    } else if (isIOS) {
+      alert("To install: tap the Share button at the bottom of your screen, then select 'Add to Home Screen'.");
+    } else {
+      alert("To install: tap the menu icon (3 dots) in your browser and select 'Install app' or 'Add to Home screen'.");
+    }
+  };
+
+  const handleClose = () => {
+    setShowPrompt(false);
+    sessionStorage.setItem('installPromptDismissed', 'true');
+  };
+
+  if (!showPrompt) return null;
+
+  return (
+    <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white rounded-2xl shadow-2xl p-4 z-[9999] border-2 border-brand-500 animate-bounce-slight flex items-center gap-4">
+      <div className="bg-brand-100 p-3 rounded-full text-brand-600 shrink-0">
+        <Download size={24} />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-bold text-slate-800 text-sm">Install Hanib Essentials</h3>
+        <p className="text-xs text-slate-500 mt-0.5">Add to home screen for faster access!</p>
+      </div>
+      <button 
+        onClick={handleInstallClick}
+        className="bg-brand-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:bg-brand-600 transition-colors shrink-0"
+      >
+        Install
+      </button>
+      <button onClick={handleClose} className="absolute -top-2 -right-2 bg-slate-800 text-white rounded-full p-1 shadow-md hover:bg-slate-700">
+        <X size={14} />
+      </button>
+      <style jsx>{`
+        .animate-bounce-slight {
+          animation: bounce-slight 2s ease-in-out infinite;
+        }
+        @keyframes bounce-slight {
+          0%, 100% { transform: translate(-50%, 0); }
+          50% { transform: translate(-50%, -5px); }
+        }
+      `}</style>
+    </div>
+  );
+}
